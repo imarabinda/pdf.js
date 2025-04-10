@@ -20,6 +20,58 @@
 /** @typedef {import("../src/display/api.js").PDFDocumentLoadingTask} PDFDocumentLoadingTask */
 
 import {
+  AnnotationEditorType,
+  build,
+  FeatureTest,
+  getDocument,
+  getFilenameFromUrl,
+  getPdfFilenameFromUrl,
+  GlobalWorkerOptions,
+  InvalidPDFException,
+  isDataScheme,
+  isPdfFile,
+  OutputScale,
+  ResponseException,
+  shadow,
+  stopEvent,
+  TouchManager,
+  version
+} from "pdfjs-lib";
+import { AltTextManager } from "web-alt_text_manager";
+import { AnnotationEditorParams } from "web-annotation_editor_params";
+import { DownloadManager } from "web-download_manager";
+import { ExternalServices, initCom, MLManager } from "web-external_services";
+import {
+  ImageAltTextSettings,
+  NewAltTextManager,
+} from "web-new_alt_text_manager";
+import { PDFAttachmentViewer } from "web-pdf_attachment_viewer";
+import { PDFCursorTools } from "web-pdf_cursor_tools";
+import { PDFDocumentProperties } from "web-pdf_document_properties";
+import { PDFFindBar } from "web-pdf_find_bar";
+import { PDFLayerViewer } from "web-pdf_layer_viewer";
+import { PDFOutlineViewer } from "web-pdf_outline_viewer";
+import { PDFPresentationMode } from "web-pdf_presentation_mode";
+import { PDFSidebar } from "web-pdf_sidebar";
+import { PDFThumbnailViewer } from "web-pdf_thumbnail_viewer";
+import { Preferences } from "web-preferences";
+import { PDFPrintServiceFactory } from "web-print_service";
+import { SecondaryToolbar } from "web-secondary_toolbar";
+import { SignatureManager } from "web-signature_manager";
+import { Toolbar } from "web-toolbar";
+import { AppOptions, OptionKind } from "./app_options.js";
+import { CaretBrowsingMode } from "./caret_browsing.js";
+import { EditorUndoBar } from "./editor_undo_bar.js";
+import { EventBus, FirefoxEventBus } from "./event_utils.js";
+import { OverlayManager } from "./overlay_manager.js";
+import { PasswordPrompt } from "./password_prompt.js";
+import { PDFFindController } from "./pdf_find_controller.js";
+import { PDFHistory } from "./pdf_history.js";
+import { LinkTarget, PDFLinkService } from "./pdf_link_service.js";
+import { PDFRenderingQueue } from "./pdf_rendering_queue.js";
+import { PDFScriptingManager } from "./pdf_scripting_manager.js";
+import { PDFViewer } from "./pdf_viewer.js";
+import {
   animationStarted,
   apiPageLayoutToViewerModes,
   apiPageModeToSidebarView,
@@ -36,62 +88,8 @@ import {
   RenderingStates,
   ScrollMode,
   SidebarView,
-  SpreadMode,
-  TextLayerMode,
+  SpreadMode
 } from "./ui_utils.js";
-import {
-  AnnotationEditorType,
-  build,
-  FeatureTest,
-  getDocument,
-  getFilenameFromUrl,
-  getPdfFilenameFromUrl,
-  GlobalWorkerOptions,
-  InvalidPDFException,
-  isDataScheme,
-  isPdfFile,
-  OutputScale,
-  PDFWorker,
-  ResponseException,
-  shadow,
-  stopEvent,
-  TouchManager,
-  version,
-} from "pdfjs-lib";
-import { AppOptions, OptionKind } from "./app_options.js";
-import { EventBus, FirefoxEventBus } from "./event_utils.js";
-import { ExternalServices, initCom, MLManager } from "web-external_services";
-import {
-  ImageAltTextSettings,
-  NewAltTextManager,
-} from "web-new_alt_text_manager";
-import { LinkTarget, PDFLinkService } from "./pdf_link_service.js";
-import { AltTextManager } from "web-alt_text_manager";
-import { AnnotationEditorParams } from "web-annotation_editor_params";
-import { CaretBrowsingMode } from "./caret_browsing.js";
-import { DownloadManager } from "web-download_manager";
-import { EditorUndoBar } from "./editor_undo_bar.js";
-import { OverlayManager } from "./overlay_manager.js";
-import { PasswordPrompt } from "./password_prompt.js";
-import { PDFAttachmentViewer } from "web-pdf_attachment_viewer";
-import { PDFCursorTools } from "web-pdf_cursor_tools";
-import { PDFDocumentProperties } from "web-pdf_document_properties";
-import { PDFFindBar } from "web-pdf_find_bar";
-import { PDFFindController } from "./pdf_find_controller.js";
-import { PDFHistory } from "./pdf_history.js";
-import { PDFLayerViewer } from "web-pdf_layer_viewer";
-import { PDFOutlineViewer } from "web-pdf_outline_viewer";
-import { PDFPresentationMode } from "web-pdf_presentation_mode";
-import { PDFPrintServiceFactory } from "web-print_service";
-import { PDFRenderingQueue } from "./pdf_rendering_queue.js";
-import { PDFScriptingManager } from "./pdf_scripting_manager.js";
-import { PDFSidebar } from "web-pdf_sidebar";
-import { PDFThumbnailViewer } from "web-pdf_thumbnail_viewer";
-import { PDFViewer } from "./pdf_viewer.js";
-import { Preferences } from "web-preferences";
-import { SecondaryToolbar } from "web-secondary_toolbar";
-import { SignatureManager } from "web-signature_manager";
-import { Toolbar } from "web-toolbar";
 import { ViewHistory } from "./view_history.js";
 
 const FORCE_PAGES_LOADED_TIMEOUT = 10000; // ms
@@ -199,9 +197,6 @@ const PDFViewerApplication = {
     } catch (ex) {
       console.error("initialize:", ex);
     }
-    if (AppOptions.get("pdfBugEnabled")) {
-      await this._parseHashParams();
-    }
 
     let mode;
     switch (AppOptions.get("viewerCssTheme")) {
@@ -267,116 +262,7 @@ const PDFViewerApplication = {
     this._initializedCapability.resolve();
   },
 
-  /**
-   * Potentially parse special debugging flags in the hash section of the URL.
-   * @private
-   */
-  async _parseHashParams() {
-    const hash = document.location.hash.substring(1);
-    if (!hash) {
-      return;
-    }
-    const { mainContainer, viewerContainer } = this.appConfig,
-      params = parseQueryString(hash);
-
-    const loadPDFBug = async () => {
-      if (this._PDFBug) {
-        return;
-      }
-      const { PDFBug } =
-        typeof PDFJSDev === "undefined"
-          ? await import(AppOptions.get("debuggerSrc")) // eslint-disable-line no-unsanitized/method
-          : await __raw_import__(AppOptions.get("debuggerSrc"));
-
-      this._PDFBug = PDFBug;
-    };
-
-    // Parameters that need to be handled manually.
-    if (params.get("disableworker") === "true") {
-      try {
-        GlobalWorkerOptions.workerSrc ||= AppOptions.get("workerSrc");
-
-        if (typeof PDFJSDev === "undefined") {
-          globalThis.pdfjsWorker = await import("pdfjs/pdf.worker.js");
-        } else {
-          await __raw_import__(PDFWorker.workerSrc);
-        }
-      } catch (ex) {
-        console.error("_parseHashParams:", ex);
-      }
-    }
-    if (params.has("textlayer")) {
-      switch (params.get("textlayer")) {
-        case "off":
-          AppOptions.set("textLayerMode", TextLayerMode.DISABLE);
-          break;
-        case "visible":
-        case "shadow":
-        case "hover":
-          viewerContainer.classList.add(`textLayer-${params.get("textlayer")}`);
-          try {
-            await loadPDFBug();
-            this._PDFBug.loadCSS();
-          } catch (ex) {
-            console.error("_parseHashParams:", ex);
-          }
-          break;
-      }
-    }
-    if (params.has("pdfbug")) {
-      AppOptions.setAll({ pdfBug: true, fontExtraProperties: true });
-
-      const enabled = params.get("pdfbug").split(",");
-      try {
-        await loadPDFBug();
-        this._PDFBug.init(mainContainer, enabled);
-      } catch (ex) {
-        console.error("_parseHashParams:", ex);
-      }
-    }
-    // It is not possible to change locale for the (various) extension builds.
-    if (
-      (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) &&
-      params.has("locale")
-    ) {
-      AppOptions.set("localeProperties", { lang: params.get("locale") });
-    }
-
-    // Parameters that can be handled automatically.
-    const opts = {
-      disableAutoFetch: x => x === "true",
-      disableFontFace: x => x === "true",
-      disableHistory: x => x === "true",
-      disableRange: x => x === "true",
-      disableStream: x => x === "true",
-      verbosity: x => x | 0,
-    };
-
-    // Set some specific preferences for tests.
-    if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("TESTING")) {
-      Object.assign(opts, {
-        docBaseUrl: x => x,
-        enableAltText: x => x === "true",
-        enableAutoLinking: x => x === "true",
-        enableFakeMLManager: x => x === "true",
-        enableGuessAltText: x => x === "true",
-        enableUpdatedAddImage: x => x === "true",
-        highlightEditorColors: x => x,
-        maxCanvasPixels: x => parseInt(x),
-        spreadModeOnLoad: x => parseInt(x),
-        supportsCaretBrowsingMode: x => x === "true",
-      });
-    }
-
-    for (const name in opts) {
-      const check = opts[name],
-        key = name.toLowerCase();
-
-      if (params.has(key)) {
-        AppOptions.set(name, check(params.get(key)));
-      }
-    }
-  },
+  
 
   /**
    * @private

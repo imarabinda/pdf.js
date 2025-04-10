@@ -165,11 +165,6 @@ const defaultOptions = {
     value: 0,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
-  debuggerSrc: {
-    /** @type {string} */
-    value: "./debugger.mjs",
-    kind: OptionKind.VIEWER,
-  },
   defaultZoomDelay: {
     /** @type {number} */
     value: 400,
@@ -309,11 +304,6 @@ const defaultOptions = {
     value: "CanvasText",
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
-  pdfBugEnabled: {
-    /** @type {boolean} */
-    value: typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING"),
-    kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
-  },
   printResolution: {
     /** @type {number} */
     value: 150,
@@ -430,11 +420,6 @@ const defaultOptions = {
   maxImageSize: {
     /** @type {number} */
     value: -1,
-    kind: OptionKind.API,
-  },
-  pdfBug: {
-    /** @type {boolean} */
-    value: false,
     kind: OptionKind.API,
   },
   standardFontDataUrl: {
