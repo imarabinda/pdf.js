@@ -21,6 +21,26 @@
 /** @typedef {import("../src/display/api").PDFDocumentLoadingTask} PDFDocumentLoadingTask */
 
 import {
+  animationStarted,
+  apiPageLayoutToViewerModes,
+  apiPageModeToSidebarView,
+  AutoPrintRegExp,
+  CursorTool,
+  DEFAULT_SCALE_VALUE,
+  getActiveOrFocusedElement,
+  isValidRotation,
+  isValidScrollMode,
+  isValidSpreadMode,
+  normalizeWheelEventDirection,
+  parseQueryString,
+  ProgressBar,
+  RenderingStates,
+  ScrollMode,
+  SidebarView,
+  SpreadMode,
+  TextLayerMode,
+} from "./ui_utils.js";
+import {
   AnnotationEditorType,
   build,
   getDocument,
@@ -187,6 +207,22 @@ class PDFViewerApplication {
     } catch (ex) {
       console.error("initialize:", ex);
     }
+    if (AppOptions.get("pdfBugEnabled")) {
+      await this._parseHashParams();
+    }
+
+    let mode;
+    switch (AppOptions.get("viewerCssTheme")) {
+      case 1:
+        mode = "is-light";
+        break;
+      case 2:
+        mode = "is-dark";
+        break;
+    }
+    if (mode) {
+      document.documentElement.classList.add(mode);
+    }
 
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING")) {
       if (AppOptions.get("enableFakeMLManager")) {
@@ -237,7 +273,118 @@ class PDFViewerApplication {
 
     this._initializedCapability.settled = true;
     this._initializedCapability.resolve();
-  }
+  },
+
+  /**
+   * Potentially parse special debugging flags in the hash section of the URL.
+   * @private
+   */
+  async _parseHashParams() {
+    const hash = document.location.hash.substring(1);
+    if (!hash) {
+      return;
+    }
+    const { mainContainer, viewerContainer } = this.appConfig,
+      params = parseQueryString(hash);
+
+    const loadPDFBug = async () => {
+      if (this._PDFBug) {
+        return;
+      }
+      const { PDFBug } =
+        typeof PDFJSDev === "undefined"
+          ? await import(AppOptions.get("debuggerSrc")) // eslint-disable-line no-unsanitized/method
+          : await __raw_import__(AppOptions.get("debuggerSrc"));
+
+      this._PDFBug = PDFBug;
+    };
+
+    // Parameters that need to be handled manually.
+    if (params.get("disableworker") === "true") {
+      try {
+        GlobalWorkerOptions.workerSrc ||= AppOptions.get("workerSrc");
+
+        if (typeof PDFJSDev === "undefined") {
+          globalThis.pdfjsWorker = await import("pdfjs/pdf.worker.js");
+        } else {
+          await __raw_import__(PDFWorker.workerSrc);
+        }
+      } catch (ex) {
+        console.error("_parseHashParams:", ex);
+      }
+    }
+    if (params.has("textlayer")) {
+      switch (params.get("textlayer")) {
+        case "off":
+          AppOptions.set("textLayerMode", TextLayerMode.DISABLE);
+          break;
+        case "visible":
+        case "shadow":
+        case "hover":
+          viewerContainer.classList.add(`textLayer-${params.get("textlayer")}`);
+          try {
+            await loadPDFBug();
+            this._PDFBug.loadCSS();
+          } catch (ex) {
+            console.error("_parseHashParams:", ex);
+          }
+          break;
+      }
+    }
+    if (params.has("pdfbug")) {
+      AppOptions.setAll({ pdfBug: true, fontExtraProperties: true });
+
+      const enabled = params.get("pdfbug").split(",");
+      try {
+        await loadPDFBug();
+        this._PDFBug.init(mainContainer, enabled);
+      } catch (ex) {
+        console.error("_parseHashParams:", ex);
+      }
+    }
+    // It is not possible to change locale for the (various) extension builds.
+    if (
+      (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) &&
+      params.has("locale")
+    ) {
+      AppOptions.set("localeProperties", { lang: params.get("locale") });
+    }
+
+    // Parameters that can be handled automatically.
+    const opts = {
+      disableAutoFetch: x => x === "true",
+      disableFontFace: x => x === "true",
+      disableHistory: x => x === "true",
+      disableRange: x => x === "true",
+      disableStream: x => x === "true",
+      verbosity: x => x | 0,
+    };
+
+    // Set some specific preferences for tests.
+    if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("TESTING")) {
+      Object.assign(opts, {
+        docBaseUrl: x => x,
+        enableAltText: x => x === "true",
+        enableAutoLinking: x => x === "true",
+        enableFakeMLManager: x => x === "true",
+        enableGuessAltText: x => x === "true",
+        enableUpdatedAddImage: x => x === "true",
+        highlightEditorColors: x => x,
+        maxCanvasPixels: x => parseInt(x),
+        spreadModeOnLoad: x => parseInt(x),
+        supportsCaretBrowsingMode: x => x === "true",
+      });
+    }
+
+    for (const name in opts) {
+      const check = opts[name],
+        key = name.toLowerCase();
+
+      if (params.has(key)) {
+        AppOptions.set(name, check(params.get(key)));
+      }
+    }
+  },
 
   /**
    * @private
@@ -691,7 +838,7 @@ class PDFViewerApplication {
 
   get supportsPrinting() {
     return PDFPrintServiceFactory.supportsPrinting;
-  }
+  },
 
   get supportsFullscreen() {
     return shadow(this, "supportsFullscreen", document.fullscreenEnabled);
