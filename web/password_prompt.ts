@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./overlay_manager.js").OverlayManager} OverlayManager */
+/** @typedef {import("./overlay_manager").OverlayManager} OverlayManager */
 
 import { PasswordResponses } from "pdfjs-lib";
 
@@ -54,7 +55,7 @@ class PasswordPrompt {
     // Attach the event listeners.
     this.submitButton.addEventListener("click", this.#verify.bind(this));
     this.cancelButton.addEventListener("click", this.close.bind(this));
-    this.input.addEventListener("keydown", e => {
+    this.input.addEventListener("keydown", (e) => {
       if (e.keyCode === /* Enter = */ 13) {
         this.#verify();
       }
@@ -84,7 +85,7 @@ class PasswordPrompt {
     }
     this.label.setAttribute(
       "data-l10n-id",
-      passwordIncorrect ? "pdfjs-password-invalid" : "pdfjs-password-label"
+      passwordIncorrect ? "pdfjs-password-invalid" : "pdfjs-password-label",
     );
   }
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2024 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./interfaces.js").IL10n} IL10n */
+/** @typedef {import("./interfaces").IL10n} IL10n */
 
 class BaseExternalServices {
   constructor() {

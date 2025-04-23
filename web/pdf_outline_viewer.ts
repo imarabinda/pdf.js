@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +14,15 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 // eslint-disable-next-line max-len
-/** @typedef {import("./download_manager.js").DownloadManager} DownloadManager */
-/** @typedef {import("./interfaces.js").IPDFLinkService} IPDFLinkService */
+/** @typedef {import("./download_manager").DownloadManager} DownloadManager */
+/** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
 // eslint-disable-next-line max-len
-/** @typedef {import("../src/display/api.js").PDFDocumentProxy} PDFDocumentProxy */
+/** @typedef {import("../src/display/api").PDFDocumentProxy} PDFDocumentProxy */
 
-import { BaseTreeViewer } from "./base_tree_viewer.js";
-import { SidebarView } from "./ui_utils.js";
+import { BaseTreeViewer } from "./base_tree_viewer";
+import { SidebarView } from "./ui_utils";
 
 /**
  * @typedef {Object} PDFOutlineViewerOptions
@@ -49,22 +50,22 @@ class PDFOutlineViewer extends BaseTreeViewer {
     this.eventBus._on("toggleoutlinetree", this._toggleAllTreeItems.bind(this));
     this.eventBus._on(
       "currentoutlineitem",
-      this._currentOutlineItem.bind(this)
+      this._currentOutlineItem.bind(this),
     );
 
-    this.eventBus._on("pagechanging", evt => {
+    this.eventBus._on("pagechanging", (evt) => {
       this._currentPageNumber = evt.pageNumber;
     });
-    this.eventBus._on("pagesloaded", evt => {
+    this.eventBus._on("pagesloaded", (evt) => {
       this._isPagesLoaded = !!evt.pagesCount;
 
       // If the capability is still pending, see the `_dispatchEvent`-method,
       // we know that the `currentOutlineItem`-button can be enabled here.
       this._currentOutlineItemCapability?.resolve(
-        /* enabled = */ this._isPagesLoaded
+        /* enabled = */ this._isPagesLoaded,
       );
     });
-    this.eventBus._on("sidebarviewchanged", evt => {
+    this.eventBus._on("sidebarviewchanged", (evt) => {
       this._sidebarView = evt.view;
     });
   }
@@ -93,7 +94,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
       this._currentOutlineItemCapability.resolve(/* enabled = */ false);
     } else if (this._isPagesLoaded !== null) {
       this._currentOutlineItemCapability.resolve(
-        /* enabled = */ this._isPagesLoaded
+        /* enabled = */ this._isPagesLoaded,
       );
     }
 
@@ -109,7 +110,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
    */
   _bindLink(
     element,
-    { url, newWindow, action, attachment, dest, setOCGState }
+    { url, newWindow, action, attachment, dest, setOCGState },
   ) {
     const { linkService } = this;
 
@@ -130,7 +131,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
       element.onclick = () => {
         this.downloadManager.openOrDownloadData(
           attachment.content,
-          attachment.filename
+          attachment.filename,
         );
         return false;
       };
@@ -146,7 +147,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
     }
 
     element.href = linkService.getDestinationHash(dest);
-    element.onclick = evt => {
+    element.onclick = (evt) => {
       this._updateCurrentTreeItem(evt.target.parentNode);
 
       if (dest) {
@@ -266,7 +267,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
     }
 
     const pageNumberToDestHash = await this._getPageNumberToDestHash(
-      this._pdfDocument
+      this._pdfDocument,
     );
     if (!pageNumberToDestHash) {
       return;
@@ -351,7 +352,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
     }
 
     this._pageNumberToDestHashCapability.resolve(
-      pageNumberToDestHash.size > 0 ? pageNumberToDestHash : null
+      pageNumberToDestHash.size > 0 ? pageNumberToDestHash : null,
     );
     return this._pageNumberToDestHashCapability.promise;
   }

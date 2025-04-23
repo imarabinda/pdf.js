@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
  */
 
 import { RenderingCancelledException } from "pdfjs-lib";
-import { RenderingStates } from "./ui_utils.js";
+import { RenderingStates } from "./ui_utils";
 
 class BasePDFPageView {
   #enableHWA = false;
@@ -102,7 +103,7 @@ class BasePDFPageView {
 
     const canvas = (this.canvas = document.createElement("canvas"));
 
-    this.#showCanvas = isLastShow => {
+    this.#showCanvas = (isLastShow) => {
       if (updateOnFirstShow) {
         // Don't add the canvas until the first draw callback, or until
         // drawing is complete when `!this.renderingQueue`, to prevent black
@@ -131,7 +132,7 @@ class BasePDFPageView {
     return { canvas, prevCanvas, ctx };
   }
 
-  #renderContinueCallback = cont => {
+  #renderContinueCallback = (cont) => {
     this.#showCanvas?.(false);
     if (this.renderingQueue && !this.renderingQueue.isHighestPriority(this)) {
       this.renderingState = RenderingStates.PAUSED;
@@ -157,7 +158,7 @@ class BasePDFPageView {
   async _drawCanvas(options, onCancel, onFinish) {
     const renderTask = (this.renderTask = this.pdfPage.render(options));
     renderTask.onContinue = this.#renderContinueCallback;
-    renderTask.onError = error => {
+    renderTask.onError = (error) => {
       if (error instanceof RenderingCancelledException) {
         onCancel();
         this.#renderError = null;

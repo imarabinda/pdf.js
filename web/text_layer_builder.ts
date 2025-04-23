@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +19,10 @@
 /** @typedef {import("../src/display/display_utils").PageViewport} PageViewport */
 /** @typedef {import("./text_highlighter").TextHighlighter} TextHighlighter */
 // eslint-disable-next-line max-len
-/** @typedef {import("./text_accessibility.js").TextAccessibilityManager} TextAccessibilityManager */
+/** @typedef {import("./text_accessibility").TextAccessibilityManager} TextAccessibilityManager */
 
 import { normalizeUnicode, stopEvent, TextLayer } from "pdfjs-lib";
-import { removeNullCharacters } from "./ui_utils.js";
+import { removeNullCharacters } from "./ui_utils";
 
 /**
  * @typedef {Object} TextLayerBuilderOptions
@@ -99,7 +100,7 @@ class TextLayerBuilder {
         textContentParams || {
           includeMarkedContent: true,
           disableNormalization: true,
-        }
+        },
       ),
       container: this.div,
       viewport,
@@ -164,12 +165,12 @@ class TextLayerBuilder {
       div.classList.add("selecting");
     });
 
-    div.addEventListener("copy", event => {
+    div.addEventListener("copy", (event) => {
       if (!this.#enablePermissions) {
         const selection = document.getSelection();
         event.clipboardData.setData(
           "text/plain",
-          removeNullCharacters(normalizeUnicode(selection.toString()))
+          removeNullCharacters(normalizeUnicode(selection.toString())),
         );
       }
       stopEvent(event);
@@ -211,7 +212,7 @@ class TextLayerBuilder {
       () => {
         isPointerDown = true;
       },
-      { signal }
+      { signal },
     );
     document.addEventListener(
       "pointerup",
@@ -219,7 +220,7 @@ class TextLayerBuilder {
         isPointerDown = false;
         this.#textLayers.forEach(reset);
       },
-      { signal }
+      { signal },
     );
     window.addEventListener(
       "blur",
@@ -227,7 +228,7 @@ class TextLayerBuilder {
         isPointerDown = false;
         this.#textLayers.forEach(reset);
       },
-      { signal }
+      { signal },
     );
     document.addEventListener(
       "keyup",
@@ -236,7 +237,7 @@ class TextLayerBuilder {
           this.#textLayers.forEach(reset);
         }
       },
-      { signal }
+      { signal },
     );
 
     if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("MOZCENTRAL")) {
@@ -284,7 +285,7 @@ class TextLayerBuilder {
         if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("CHROME")) {
           isFirefox ??=
             getComputedStyle(
-              this.#textLayers.values().next().value
+              this.#textLayers.values().next().value,
             ).getPropertyValue("-moz-user-select") === "none";
 
           if (isFirefox) {
@@ -323,13 +324,13 @@ class TextLayerBuilder {
           endDiv.style.height = parentTextLayer.style.height;
           anchor.parentElement.insertBefore(
             endDiv,
-            modifyStart ? anchor : anchor.nextSibling
+            modifyStart ? anchor : anchor.nextSibling,
           );
         }
 
         prevRange = range.cloneRange();
       },
-      { signal }
+      { signal },
     );
   }
 }

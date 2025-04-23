@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2021 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +14,15 @@
  * limitations under the License.
  */
 
-import { docProperties, GenericScripting } from "./generic_scripting.js";
-import { PDFScriptingManager } from "./pdf_scripting_manager.js";
+import { docProperties, GenericScripting } from "./generic_scripting";
+import { PDFScriptingManager } from "./pdf_scripting_manager";
 
 class PDFScriptingManagerComponents extends PDFScriptingManager {
   constructor(options) {
     // The default viewer already handles adding/removing of DOM events,
     // hence limit this to only the viewer components.
     if (!options.externalServices) {
-      window.addEventListener("updatefromsandbox", event => {
+      window.addEventListener("updatefromsandbox", (event) => {
         options.eventBus.dispatch("updatefromsandbox", {
           source: window,
           detail: event.detail,
@@ -32,7 +33,7 @@ class PDFScriptingManagerComponents extends PDFScriptingManager {
     options.externalServices ||= {
       createScripting: () => new GenericScripting(options.sandboxBundleSrc),
     };
-    options.docProperties ||= pdfDocument => docProperties(pdfDocument);
+    options.docProperties ||= (pdfDocument) => docProperties(pdfDocument);
     super(options);
   }
 }

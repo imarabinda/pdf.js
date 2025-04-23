@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
  * limitations under the License.
  */
 
-import { FindState } from "./pdf_find_controller.js";
-import { toggleExpandedBtn } from "./ui_utils.js";
+import { FindState } from "./pdf_find_controller";
+import { toggleExpandedBtn } from "./ui_utils";
 
 const MATCHES_COUNT_LIMIT = 1000;
 
@@ -54,7 +55,7 @@ class PDFFindBar {
     ]);
 
     // Add event listeners to the DOM elements.
-    this.toggleButton.addEventListener("click", () => {
+    this.toggleButton?.addEventListener("click", () => {
       this.toggle();
     });
 
@@ -154,11 +155,11 @@ class PDFFindBar {
         "data-l10n-id",
         total > limit
           ? "pdfjs-find-match-count-limit"
-          : "pdfjs-find-match-count"
+          : "pdfjs-find-match-count",
       );
       findResultsCount.setAttribute(
         "data-l10n-args",
-        JSON.stringify({ limit, current, total })
+        JSON.stringify({ limit, current, total }),
       );
     } else {
       findResultsCount.removeAttribute("data-l10n-id");

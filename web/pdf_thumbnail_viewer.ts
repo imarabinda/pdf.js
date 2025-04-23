@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,14 +21,14 @@
 // eslint-disable-next-line max-len
 /** @typedef {import("./pdf_rendering_queue").PDFRenderingQueue} PDFRenderingQueue */
 
+import { PDFThumbnailView, TempImageFactory } from "./pdf_thumbnail_view";
 import {
   getVisibleElements,
   isValidRotation,
   RenderingStates,
   scrollIntoView,
   watchScroll,
-} from "./ui_utils.js";
-import { PDFThumbnailView, TempImageFactory } from "./pdf_thumbnail_view.js";
+} from "./ui_utils";
 
 const THUMBNAIL_SCROLL_MARGIN = -19;
 const THUMBNAIL_SELECTED_CLASS = "selected";
@@ -84,7 +85,7 @@ class PDFThumbnailViewer {
     this.scroll = watchScroll(
       this.container,
       this.#scrollUpdated.bind(this),
-      abortSignal
+      abortSignal,
     );
     this.#resetView();
   }
@@ -206,7 +207,7 @@ class PDFThumbnailViewer {
     });
 
     firstPagePromise
-      .then(firstPdfPage => {
+      .then((firstPdfPage) => {
         const pagesCount = pdfDocument.numPages;
         const viewport = firstPdfPage.getViewport({ scale: 1 });
 
@@ -235,7 +236,7 @@ class PDFThumbnailViewer {
         const thumbnailView = this._thumbnails[this._currentPageNumber - 1];
         thumbnailView.div.classList.add(THUMBNAIL_SELECTED_CLASS);
       })
-      .catch(reason => {
+      .catch((reason) => {
         console.error("Unable to initialize thumbnail viewer", reason);
       });
   }
@@ -306,7 +307,7 @@ class PDFThumbnailViewer {
       this._thumbnails,
       scrollAhead,
       /* preRenderExtra */ false,
-      /* ignoreDetailViews */ true
+      /* ignoreDetailViews */ true,
     );
     if (thumbView) {
       this.#ensurePdfPageLoaded(thumbView).then(() => {

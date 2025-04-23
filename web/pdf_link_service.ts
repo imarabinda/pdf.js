@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2015 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,7 @@
 /** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
 
 import { isValidExplicitDest } from "pdfjs-lib";
-import { parseQueryString } from "./ui_utils.js";
+import { parseQueryString } from "./ui_utils";
 
 const DEFAULT_LINK_REL = "noopener noreferrer nofollow";
 
@@ -148,7 +149,7 @@ class PDFLinkService {
     }
     if (!Array.isArray(explicitDest)) {
       console.error(
-        `goToDestination: "${explicitDest}" is not a valid destination array, for dest="${dest}".`
+        `goToDestination: "${explicitDest}" is not a valid destination array, for dest="${dest}".`,
       );
       return;
     }
@@ -165,7 +166,7 @@ class PDFLinkService {
           pageNumber = (await this.pdfDocument.getPageIndex(destRef)) + 1;
         } catch {
           console.error(
-            `goToDestination: "${destRef}" is not a valid page reference, for dest="${dest}".`
+            `goToDestination: "${destRef}" is not a valid page reference, for dest="${dest}".`,
           );
           return;
         }
@@ -175,7 +176,7 @@ class PDFLinkService {
     }
     if (!pageNumber || pageNumber < 1 || pageNumber > this.pagesCount) {
       console.error(
-        `goToDestination: "${pageNumber}" is not a valid page number, for dest="${dest}".`
+        `goToDestination: "${pageNumber}" is not a valid page number, for dest="${dest}".`,
       );
       return;
     }
@@ -353,7 +354,7 @@ class PDFLinkService {
         } else if (zoomArg === "FitR") {
           if (zoomArgs.length !== 5) {
             console.error(
-              'PDFLinkService.setHash: Not enough parameters for "FitR".'
+              'PDFLinkService.setHash: Not enough parameters for "FitR".',
             );
           } else {
             dest = [
@@ -367,7 +368,7 @@ class PDFLinkService {
           }
         } else {
           console.error(
-            `PDFLinkService.setHash: "${zoomArg}" is not a valid zoom value.`
+            `PDFLinkService.setHash: "${zoomArg}" is not a valid zoom value.`,
           );
         }
       }
@@ -421,7 +422,7 @@ class PDFLinkService {
       return;
     }
     console.error(
-      `PDFLinkService.setHash: "${unescape(hash)}" is not a valid destination.`
+      `PDFLinkService.setHash: "${unescape(hash)}" is not a valid destination.`,
     );
   }
 
@@ -484,7 +485,7 @@ class PDFLinkService {
     optionalContentConfig.setOCGState(action);
 
     this.pdfViewer.optionalContentConfigPromise = Promise.resolve(
-      optionalContentConfig
+      optionalContentConfig,
     );
   }
 }

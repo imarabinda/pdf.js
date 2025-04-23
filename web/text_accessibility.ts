@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2022 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-import { binarySearchFirstItem } from "./ui_utils.js";
+import { binarySearchFirstItem } from "./ui_utils";
 
 /**
  * This class aims to provide some methods:
@@ -155,7 +156,7 @@ class TextAccessibilityManager {
     if (owns?.includes(id)) {
       owns = owns
         .split(" ")
-        .filter(x => x !== id)
+        .filter((x) => x !== id)
         .join(" ");
       if (owns) {
         node.setAttribute("aria-owns", owns);
@@ -204,8 +205,8 @@ class TextAccessibilityManager {
 
     const index = binarySearchFirstItem(
       children,
-      node =>
-        TextAccessibilityManager.#compareElementPositions(element, node) < 0
+      (node) =>
+        TextAccessibilityManager.#compareElementPositions(element, node) < 0,
     );
 
     const nodeIndex = Math.max(0, index - 1);
@@ -231,7 +232,7 @@ class TextAccessibilityManager {
     }
 
     const children = Array.from(container.childNodes).filter(
-      node => node !== element
+      (node) => node !== element,
     );
 
     if (children.length === 0) {
@@ -241,11 +242,11 @@ class TextAccessibilityManager {
     const elementToCompare = contentElement || element;
     const index = binarySearchFirstItem(
       children,
-      node =>
+      (node) =>
         TextAccessibilityManager.#compareElementPositions(
           elementToCompare,
-          node
-        ) < 0
+          node,
+        ) < 0,
     );
 
     if (index === 0) {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,12 +25,12 @@
 /** @typedef {import("./pdf_rendering_queue").PDFRenderingQueue} PDFRenderingQueue */
 
 import { OutputScale, RenderingCancelledException } from "pdfjs-lib";
-import { AppOptions } from "./app_options.js";
-import { RenderingStates } from "./ui_utils.js";
+import { AppOptions } from "./app_options";
+import { RenderingStates } from "./ui_utils";
 
 const DRAW_UPSCALE_FACTOR = 2; // See comment in `PDFThumbnailView.draw` below.
 const MAX_NUM_SCALING_STEPS = 3;
-const THUMBNAIL_WIDTH = 98; // px
+const THUMBNAIL_WIDTH = 180; // px
 
 function zeroCanvas(c) {
   // Zeroing the width and height causes Firefox to release graphics
@@ -152,6 +153,12 @@ class PDFThumbnailView {
 
     div.append(img);
     anchor.append(div);
+
+    const pageNumber = document.createElement("div");
+    pageNumber.className = "thumbnailPageNumber";
+    pageNumber.textContent = String(this.id).padStart(2, "0");
+    anchor.append(pageNumber);
+
     container.append(anchor);
   }
 
@@ -230,7 +237,7 @@ class PDFThumbnailView {
       width,
       height,
       this.maxCanvasPixels,
-      this.maxCanvasDim
+      this.maxCanvasDim,
     );
     canvas.width = (width * outputScale.sx) | 0;
     canvas.height = (height * outputScale.sy) | 0;
@@ -285,7 +292,7 @@ class PDFThumbnailView {
     const drawViewport = this.viewport.clone({
       scale: DRAW_UPSCALE_FACTOR * this.scale,
     });
-    const renderContinueCallback = cont => {
+    const renderContinueCallback = (cont) => {
       if (!this.renderingQueue.isHighestPriority(this)) {
         this.renderingState = RenderingStates.PAUSED;
         this.resume = () => {
@@ -372,7 +379,7 @@ class PDFThumbnailView {
       width,
       height,
       this.maxCanvasPixels,
-      this.maxCanvasDim
+      this.maxCanvasDim,
     );
     return [(width * outputScale.sx) | 0, (height * outputScale.sy) | 0];
   }
@@ -390,7 +397,7 @@ class PDFThumbnailView {
         0,
         0,
         canvas.width,
-        canvas.height
+        canvas.height,
       );
       return canvas;
     }
@@ -398,7 +405,7 @@ class PDFThumbnailView {
     let [reducedWidth, reducedHeight] = this.#getReducedImageDims(canvas);
     const [reducedImage, reducedImageCtx] = TempImageFactory.getCanvas(
       reducedWidth,
-      reducedHeight
+      reducedHeight,
     );
 
     while (reducedWidth > img.width || reducedHeight > img.height) {
@@ -414,7 +421,7 @@ class PDFThumbnailView {
       0,
       0,
       reducedWidth,
-      reducedHeight
+      reducedHeight,
     );
     while (reducedWidth > 2 * canvas.width) {
       reducedImageCtx.drawImage(
@@ -426,7 +433,7 @@ class PDFThumbnailView {
         0,
         0,
         reducedWidth >> 1,
-        reducedHeight >> 1
+        reducedHeight >> 1,
       );
       reducedWidth >>= 1;
       reducedHeight >>= 1;
@@ -440,7 +447,7 @@ class PDFThumbnailView {
       0,
       0,
       canvas.width,
-      canvas.height
+      canvas.height,
     );
     return canvas;
   }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2022 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 
 import { AnnotationEditorParamsType } from "pdfjs-lib";
 
@@ -100,7 +101,7 @@ class AnnotationEditorParams {
       dispatchEvent("CREATE");
     });
 
-    eventBus._on("annotationeditorparamschanged", evt => {
+    eventBus._on("annotationeditorparamschanged", (evt) => {
       for (const [type, value] of evt.details) {
         switch (type) {
           case AnnotationEditorParamsType.FREETEXT_SIZE:

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2017 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +14,16 @@
  * limitations under the License.
  */
 
-import { AppOptions } from "./app_options.js";
-import { BaseExternalServices } from "./external_services.js";
-import { BasePreferences } from "./preferences.js";
-import { GenericL10n } from "./genericl10n.js";
-import { GenericScripting } from "./generic_scripting.js";
-import { SignatureStorage } from "./generic_signature_storage.js";
+import { AppOptions } from "./app_options";
+import { BaseExternalServices } from "./external_services";
+import { GenericScripting } from "./generic_scripting";
+import { SignatureStorage } from "./generic_signature_storage";
+import { GenericL10n } from "./genericl10n";
+import { BasePreferences } from "./preferences";
 
 if (typeof PDFJSDev !== "undefined" && !PDFJSDev.test("GENERIC")) {
   throw new Error(
-    'Module "pdfjs-web/genericcom" shall not be used outside GENERIC build.'
+    'Module "pdfjs-web/genericcom" shall not be used outside GENERIC build.',
   );
 }
 
@@ -55,7 +56,7 @@ class ExternalServices extends BaseExternalServices {
 class MLManager {
   static {
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING")) {
-      this.getFakeMLManager = options => new FakeMLManager(options);
+      this.getFakeMLManager = (options) => new FakeMLManager(options);
     }
   }
 
@@ -139,7 +140,7 @@ if (typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING")) {
     }
 
     guess({ request: { data } }) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve(data ? { output: "Fake alt text." } : { error: true });
         }, 3000);

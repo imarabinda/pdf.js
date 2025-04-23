@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2022 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +15,20 @@
  */
 
 /** @typedef {import("../src/display/api").PDFPageProxy} PDFPageProxy */
-// eslint-disable-next-line max-len
+
 /** @typedef {import("../src/display/display_utils").PageViewport} PageViewport */
-// eslint-disable-next-line max-len
-/** @typedef {import("../src/display/editor/tools.js").AnnotationEditorUIManager} AnnotationEditorUIManager */
-// eslint-disable-next-line max-len
-/** @typedef {import("./text_accessibility.js").TextAccessibilityManager} TextAccessibilityManager */
+
+/** @typedef {import("../src/display/editor/tools").AnnotationEditorUIManager} AnnotationEditorUIManager */
+
+/** @typedef {import("./text_accessibility").TextAccessibilityManager} TextAccessibilityManager */
 /** @typedef {import("./interfaces").IL10n} IL10n */
-// eslint-disable-next-line max-len
-/** @typedef {import("../src/display/annotation_layer.js").AnnotationLayer} AnnotationLayer */
-// eslint-disable-next-line max-len
-/** @typedef {import("../src/display/struct_tree_layer_builder.js").StructTreeLayerBuilder} StructTreeLayerBuilder */
+
+/** @typedef {import("../src/display/annotation_layer").AnnotationLayer} AnnotationLayer */
+
+/** @typedef {import("../src/display/struct_tree_layer_builder").StructTreeLayerBuilder} StructTreeLayerBuilder */
 
 import { AnnotationEditorLayer } from "pdfjs-lib";
-import { GenericL10n } from "web-null_l10n";
+import { GenericL10n } from "./genericl10n";
 
 /**
  * @typedef {Object} AnnotationEditorLayerBuilderOptions

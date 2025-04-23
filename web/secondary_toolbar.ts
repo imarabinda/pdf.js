@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +14,16 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 
+import { PagesCountLimit } from "./pdf_viewer";
 import {
   CursorTool,
   ScrollMode,
   SpreadMode,
   toggleCheckedBtn,
   toggleExpandedBtn,
-} from "./ui_utils.js";
-import { PagesCountLimit } from "./pdf_viewer.js";
+} from "./ui_utils";
 
 /**
  * @typedef {Object} SecondaryToolbarOptions
@@ -218,7 +219,7 @@ class SecondaryToolbar {
 
     // All items within the secondary toolbar.
     for (const { element, eventName, close, eventDetails } of buttons) {
-      element.addEventListener("click", evt => {
+      element.addEventListener("click", (evt) => {
         if (eventName !== null) {
           eventBus.dispatch(eventName, { source: this, ...eventDetails });
         }

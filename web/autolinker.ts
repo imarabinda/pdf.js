@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2025 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
  */
 
 import { AnnotationType, createValidAbsoluteUrl, Util } from "pdfjs-lib";
-import { getOriginalIndex, normalize } from "./pdf_find_controller.js";
+import { getOriginalIndex, normalize } from "./pdf_find_controller";
 
 function DOMRectToPDF({ width, height, left, top }, pdfPageView) {
   if (width === 0 || height === 0) {
@@ -24,11 +25,11 @@ function DOMRectToPDF({ width, height, left, top }, pdfPageView) {
   const pageBox = pdfPageView.textLayer.div.getBoundingClientRect();
   const bottomLeft = pdfPageView.getPagePoint(
     left - pageBox.left,
-    top - pageBox.top
+    top - pageBox.top,
   );
   const topRight = pdfPageView.getPagePoint(
     left - pageBox.left + width,
-    top - pageBox.top + height
+    top - pageBox.top + height,
   );
 
   return Util.normalizeRect([
@@ -111,7 +112,7 @@ function createLinkAnnotation({ url, index, length }, pdfPageView, id) {
 
   const range = new Range();
   range.setStart(
-    ...textPosition(highlighter.textDivs[begin.divIdx], begin.offset)
+    ...textPosition(highlighter.textDivs[begin.divIdx], begin.offset),
   );
   range.setEnd(...textPosition(highlighter.textDivs[end.divIdx], end.offset));
 
@@ -162,7 +163,7 @@ class Autolinker {
         const [index, length] = getOriginalIndex(
           diffs,
           match.index,
-          url.length
+          url.length,
         );
         links.push({ url: absoluteURL.href, index, length });
       }
@@ -172,8 +173,8 @@ class Autolinker {
 
   static processLinks(pdfPageView) {
     return this.findLinks(
-      pdfPageView._textHighlighter.textContentItemsStr.join("\n")
-    ).map(link => createLinkAnnotation(link, pdfPageView, this.#index++));
+      pdfPageView._textHighlighter.textContentItemsStr.join("\n"),
+    ).map((link) => createLinkAnnotation(link, pdfPageView, this.#index++));
   }
 }
 

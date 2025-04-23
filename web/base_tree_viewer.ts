@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2020 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-import { removeNullCharacters } from "./ui_utils.js";
+import { removeNullCharacters } from "./ui_utils";
 
 const TREEITEM_OFFSET_TOP = -100; // px
 const TREEITEM_SELECTED_CLASS = "selected";
@@ -84,7 +85,7 @@ class BaseTreeViewer {
     if (hidden) {
       toggler.classList.add("treeItemsHidden");
     }
-    toggler.onclick = evt => {
+    toggler.onclick = (evt) => {
       evt.stopPropagation();
       toggler.classList.toggle("treeItemsHidden");
 
@@ -184,7 +185,7 @@ class BaseTreeViewer {
 
     this.container.scrollTo(
       treeItem.offsetLeft,
-      treeItem.offsetTop + TREEITEM_OFFSET_TOP
+      treeItem.offsetTop + TREEITEM_OFFSET_TOP,
     );
   }
 }

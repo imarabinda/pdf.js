@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2016 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 
 import { AnnotationEditorType, ColorPicker, noContextMenu } from "pdfjs-lib";
 import {
@@ -22,7 +23,7 @@ import {
   MAX_SCALE,
   MIN_SCALE,
   toggleExpandedBtn,
-} from "./ui_utils.js";
+} from "./ui_utils";
 
 /**
  * @typedef {Object} ToolbarOptions
@@ -198,7 +199,7 @@ class Toolbar {
 
     // The buttons within the toolbar.
     for (const { element, eventName, eventDetails, telemetry } of buttons) {
-      element.addEventListener("click", evt => {
+      element.addEventListener("click", (evt) => {
         if (eventName !== null) {
           eventBus.dispatch(eventName, {
             source: this,
@@ -252,7 +253,7 @@ class Toolbar {
 
     eventBus._on(
       "annotationeditormodechanged",
-      this.#editorModeChanged.bind(this)
+      this.#editorModeChanged.bind(this),
     );
     eventBus._on("showannotationeditorui", ({ mode }) => {
       switch (mode) {
@@ -293,27 +294,27 @@ class Toolbar {
     toggleExpandedBtn(
       editorFreeTextButton,
       mode === AnnotationEditorType.FREETEXT,
-      editorFreeTextParamsToolbar
+      editorFreeTextParamsToolbar,
     );
     toggleExpandedBtn(
       editorHighlightButton,
       mode === AnnotationEditorType.HIGHLIGHT,
-      editorHighlightParamsToolbar
+      editorHighlightParamsToolbar,
     );
     toggleExpandedBtn(
       editorInkButton,
       mode === AnnotationEditorType.INK,
-      editorInkParamsToolbar
+      editorInkParamsToolbar,
     );
     toggleExpandedBtn(
       editorStampButton,
       mode === AnnotationEditorType.STAMP,
-      editorStampParamsToolbar
+      editorStampParamsToolbar,
     );
     toggleExpandedBtn(
       editorSignatureButton,
       mode === AnnotationEditorType.SIGNATURE,
-      editorSignatureParamsToolbar
+      editorSignatureParamsToolbar,
     );
 
     const isDisable = mode === AnnotationEditorType.DISABLE;
@@ -339,7 +340,7 @@ class Toolbar {
         opts.numPages.setAttribute("data-l10n-id", "pdfjs-of-pages");
         opts.numPages.setAttribute(
           "data-l10n-args",
-          JSON.stringify({ pagesCount })
+          JSON.stringify({ pagesCount }),
         );
       }
       opts.pageNumber.max = pagesCount;
@@ -350,7 +351,7 @@ class Toolbar {
 
       opts.numPages.setAttribute(
         "data-l10n-args",
-        JSON.stringify({ pageNumber, pagesCount })
+        JSON.stringify({ pageNumber, pagesCount }),
       );
     } else {
       opts.pageNumber.value = pageNumber;
@@ -377,7 +378,7 @@ class Toolbar {
         "data-l10n-args",
         JSON.stringify({
           scale: Math.round(pageScale * 10000) / 100,
-        })
+        }),
       );
     }
   }

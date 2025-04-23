@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2014 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ScrollMode, SpreadMode } from "./ui_utils.js";
-import { PDFViewer } from "./pdf_viewer.js";
+import { PDFViewer } from "./pdf_viewer";
+import { ScrollMode, SpreadMode } from "./ui_utils";
 
 class PDFSinglePageViewer extends PDFViewer {
   _resetView() {

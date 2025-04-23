@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +14,16 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
-/** @typedef {import("./pdf_viewer.js").PDFViewer} PDFViewer */
+/** @typedef {import("./event_utils").EventBus} EventBus */
+/** @typedef {import("./pdf_viewer").PDFViewer} PDFViewer */
 
+import { AnnotationEditorType } from "pdfjs-lib";
 import {
   normalizeWheelEventDelta,
   PresentationModeState,
   ScrollMode,
   SpreadMode,
-} from "./ui_utils.js";
-import { AnnotationEditorType } from "pdfjs-lib";
+} from "./ui_utils";
 
 const DELAY_BEFORE_HIDING_CONTROLS = 3000; // in ms
 const ACTIVE_SELECTOR = "pdfPresentationMode";
@@ -96,7 +97,7 @@ class PDFPresentationMode {
     ) {
       console.warn(
         "Ignoring Spread modes when entering PresentationMode, " +
-          "since the document may contain varying page sizes."
+          "since the document may contain varying page sizes.",
       );
       this.#args.spreadMode = pdfViewer.spreadMode;
     }
@@ -399,7 +400,7 @@ class PDFPresentationMode {
           this.#exit();
         }
       },
-      { signal: this.#fullscreenChangeAbortController.signal }
+      { signal: this.#fullscreenChangeAbortController.signal },
     );
   }
 

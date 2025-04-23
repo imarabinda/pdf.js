@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2021 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,8 @@
 
 /** @typedef {import("./event_utils").EventBus} EventBus */
 
-import { apiPageLayoutToViewerModes, RenderingStates } from "./ui_utils.js";
 import { shadow } from "pdfjs-lib";
+import { apiPageLayoutToViewerModes, RenderingStates } from "./ui_utils";
 
 /**
  * @typedef {Object} PDFScriptingManagerOptions
@@ -69,7 +70,7 @@ class PDFScriptingManager {
               this.#scripting?.dispatchEventInSandbox({
                 name: "sandboxtripbegin",
               }),
-            0
+            0,
           ),
       });
     }
@@ -117,19 +118,19 @@ class PDFScriptingManager {
 
     eventBus._on(
       "updatefromsandbox",
-      event => {
+      (event) => {
         if (event?.source === window) {
           this.#updateFromSandbox(event.detail);
         }
       },
-      { signal }
+      { signal },
     );
     eventBus._on(
       "dispatcheventinsandbox",
-      event => {
+      (event) => {
         this.#scripting?.dispatchEventInSandbox(event.detail);
       },
-      { signal }
+      { signal },
     );
 
     eventBus._on(
@@ -141,7 +142,7 @@ class PDFScriptingManager {
         this.#dispatchPageClose(previous);
         this.#dispatchPageOpen(pageNumber);
       },
-      { signal }
+      { signal },
     );
     eventBus._on(
       "pagerendered",
@@ -154,7 +155,7 @@ class PDFScriptingManager {
         }
         this.#dispatchPageOpen(pageNumber);
       },
-      { signal }
+      { signal },
     );
     eventBus._on(
       "pagesdestroy",
@@ -168,7 +169,7 @@ class PDFScriptingManager {
 
         this.#closeCapability?.resolve();
       },
-      { signal }
+      { signal },
     );
 
     try {
@@ -204,7 +205,7 @@ class PDFScriptingManager {
     });
     await this.#dispatchPageOpen(
       this.#pdfViewer.currentPageNumber,
-      /* initialize = */ true
+      /* initialize = */ true,
     );
 
     // Defer this slightly, to ensure that scripting is *fully* initialized.
@@ -367,7 +368,7 @@ class PDFScriptingManager {
     const ids = siblings ? [id, ...siblings] : [id];
     for (const elementId of ids) {
       const element = document.querySelector(
-        `[data-element-id="${elementId}"]`
+        `[data-element-id="${elementId}"]`,
       );
       if (element) {
         element.dispatchEvent(new CustomEvent("updatefromsandbox", { detail }));
@@ -463,7 +464,7 @@ class PDFScriptingManager {
     if (this.#closeCapability) {
       await Promise.race([
         this.#closeCapability.promise,
-        new Promise(resolve => {
+        new Promise((resolve) => {
           // Avoid the scripting/sandbox-destruction hanging indefinitely.
           setTimeout(resolve, 1000);
         }),

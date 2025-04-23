@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2016 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
  */
 
 // eslint-disable-next-line max-len
-/** @typedef {import("./interfaces.js").IPDFPrintServiceFactory} IPDFPrintServiceFactory */
+/** @typedef {import("./interfaces").IPDFPrintServiceFactory} IPDFPrintServiceFactory */
 
 import {
   AnnotationMode,
@@ -22,7 +23,7 @@ import {
   RenderingCancelledException,
   shadow,
 } from "pdfjs-lib";
-import { getXfaHtmlForPrinting } from "./print_utils.js";
+import { getXfaHtmlForPrinting } from "./print_utils";
 
 let activeService = null;
 let dialog = null;
@@ -38,7 +39,7 @@ function renderPage(
   size,
   printResolution,
   optionalContentConfigPromise,
-  printAnnotationStoragePromise
+  printAnnotationStoragePromise,
 ) {
   const scratchCanvas = activeService.scratchCanvas;
 
@@ -68,7 +69,7 @@ function renderPage(
     };
     const renderTask = pdfPage.render(renderContext);
 
-    return renderTask.promise.catch(reason => {
+    return renderTask.promise.catch((reason) => {
       if (!(reason instanceof RenderingCancelledException)) {
         console.error(reason);
       }
@@ -107,11 +108,11 @@ class PDFPrintService {
 
     const { width, height } = this.pagesOverview[0];
     const hasEqualPageSizes = this.pagesOverview.every(
-      size => size.width === width && size.height === height
+      (size) => size.width === width && size.height === height,
     );
     if (!hasEqualPageSizes) {
       console.warn(
-        "Not all pages have the same size. The printed result may be incorrect!"
+        "Not all pages have the same size. The printed result may be incorrect!",
       );
     }
 
@@ -175,7 +176,7 @@ class PDFPrintService {
         this.pagesOverview[index],
         this._printResolution,
         this._optionalContentConfigPromise,
-        this._printAnnotationStoragePromise
+        this._printAnnotationStoragePromise,
       )
         .then(this.useRenderedPage.bind(this))
         .then(function () {
@@ -188,7 +189,7 @@ class PDFPrintService {
   useRenderedPage() {
     this.throwIfInactive();
     const img = document.createElement("img");
-    this.scratchCanvas.toBlob(blob => {
+    this.scratchCanvas.toBlob((blob) => {
       img.src = URL.createObjectURL(blob);
     });
 
@@ -213,7 +214,7 @@ class PDFPrintService {
 
   performPrint() {
     this.throwIfInactive();
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       // Push window.print in the macrotask queue to avoid being affected by
       // the deprecation of running print() code in a microtask, see
       // https://github.com/mozilla/pdf.js/issues/7547.
@@ -327,7 +328,7 @@ window.addEventListener(
       event.stopImmediatePropagation();
     }
   },
-  true
+  true,
 );
 
 if ("onbeforeprint" in window) {
@@ -346,7 +347,7 @@ let overlayPromise;
 function ensureOverlay() {
   if (typeof PDFJSDev === "undefined" && window.isGECKOVIEW) {
     return Promise.reject(
-      new Error("ensureOverlay not implemented in GECKOVIEW development mode.")
+      new Error("ensureOverlay not implemented in GECKOVIEW development mode."),
     );
   }
   if (!overlayPromise) {
@@ -358,7 +359,7 @@ function ensureOverlay() {
 
     overlayPromise = overlayManager.register(
       dialog,
-      /* canForceClose = */ true
+      /* canForceClose = */ true,
     );
 
     document.getElementById("printCancel").onclick = abort;

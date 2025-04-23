@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2014 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +16,17 @@
 
 /** @typedef {import("../src/display/api").PDFDocumentProxy} PDFDocumentProxy */
 /** @typedef {import("../src/display/api").PDFPageProxy} PDFPageProxy */
-// eslint-disable-next-line max-len
+
 /** @typedef {import("../src/display/display_utils").PageViewport} PageViewport */
-// eslint-disable-next-line max-len
+
 /** @typedef {import("../src/display/optional_content_config").OptionalContentConfig} OptionalContentConfig */
 /** @typedef {import("./event_utils").EventBus} EventBus */
 /** @typedef {import("./interfaces").IDownloadManager} IDownloadManager */
 /** @typedef {import("./interfaces").IL10n} IL10n */
 /** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
-// eslint-disable-next-line max-len
+
 /** @typedef {import("./pdf_find_controller").PDFFindController} PDFFindController */
-// eslint-disable-next-line max-len
+
 /** @typedef {import("./pdf_scripting_manager").PDFScriptingManager} PDFScriptingManager */
 
 import {
@@ -36,8 +37,11 @@ import {
   PixelsPerInch,
   shadow,
   stopEvent,
-  version,
 } from "pdfjs-lib";
+import { GenericL10n } from "./genericl10n";
+import { SimpleLinkService } from "./pdf_link_service";
+import { PDFPageView } from "./pdf_page_view";
+import { PDFRenderingQueue } from "./pdf_rendering_queue";
 import {
   DEFAULT_SCALE,
   DEFAULT_SCALE_DELTA,
@@ -62,11 +66,7 @@ import {
   UNKNOWN_SCALE,
   VERTICAL_PADDING,
   watchScroll,
-} from "./ui_utils.js";
-import { GenericL10n } from "web-null_l10n";
-import { PDFPageView } from "./pdf_page_view.js";
-import { PDFRenderingQueue } from "./pdf_rendering_queue.js";
-import { SimpleLinkService } from "./pdf_link_service.js";
+} from "./ui_utils";
 
 const DEFAULT_CACHE_SIZE = 10;
 
@@ -274,13 +274,6 @@ class PDFViewer {
    * @param {PDFViewerOptions} options
    */
   constructor(options) {
-    const viewerVersion =
-      typeof PDFJSDev !== "undefined" ? PDFJSDev.eval("BUNDLE_VERSION") : null;
-    if (version !== viewerVersion) {
-      throw new Error(
-        `The API version "${version}" does not match the Viewer version "${viewerVersion}".`
-      );
-    }
     this.container = options.container;
     this.viewer = options.viewer || options.container.firstElementChild;
 
@@ -307,7 +300,7 @@ class PDFViewer {
     this.#editorUndoBar = options.editorUndoBar || null;
 
     if (this.findController) {
-      this.findController.onIsPageVisible = pageNumber =>
+      this.findController.onIsPageVisible = (pageNumber) =>
         this._getVisiblePages().ids.has(pageNumber);
     }
     this._scriptingManager = options.scriptingManager || null;
@@ -361,13 +354,13 @@ class PDFViewer {
         this.#resizeObserver.disconnect();
         this.#resizeObserver = null;
       },
-      { once: true }
+      { once: true },
     );
 
     this.scroll = watchScroll(
       this.container,
       this._scrollUpdate.bind(this),
-      abortSignal
+      abortSignal,
     );
     this.presentationModeState = PresentationModeState.UNKNOWN;
     this._resetView();
@@ -417,7 +410,7 @@ class PDFViewer {
   get pageViewsReady() {
     // Prevent printing errors when 'disableAutoFetch' is set, by ensuring
     // that *all* pages have in fact been completely loaded.
-    return this._pages.every(pageView => pageView?.pdfPage);
+    return this._pages.every((pageView) => pageView?.pdfPage);
   }
 
   /**
@@ -711,7 +704,7 @@ class PDFViewer {
           hiddenCapability.resolve();
         }
       },
-      { signal: AbortSignal.any([signal, ac.signal]) }
+      { signal: AbortSignal.any([signal, ac.signal]) },
     );
 
     await Promise.race([
@@ -786,19 +779,19 @@ class PDFViewer {
       const ac = new AbortController();
       window.addEventListener(
         "keydown",
-        ev => (this.#interruptCopyCondition = ev.key === "Escape"),
-        { signal: ac.signal }
+        (ev) => (this.#interruptCopyCondition = ev.key === "Escape"),
+        { signal: ac.signal },
       );
 
       this.getAllText()
-        .then(async text => {
+        .then(async (text) => {
           if (text !== null) {
             await navigator.clipboard.writeText(text);
           }
         })
-        .catch(reason => {
+        .catch((reason) => {
           console.warn(
-            `Something goes wrong when extracting the text: ${reason.message}`
+            `Something goes wrong when extracting the text: ${reason.message}`,
           );
         })
         .finally(() => {
@@ -852,7 +845,7 @@ class PDFViewer {
     // enforce usage of PAGE-scrolling when loading *very* long/large documents.
     if (pagesCount > PagesCountLimit.FORCE_SCROLL_MODE_PAGE) {
       console.warn(
-        "Forcing PAGE-scrolling for performance reasons, given the length of the document."
+        "Forcing PAGE-scrolling for performance reasons, given the length of the document.",
       );
       const mode = (this._scrollMode = ScrollMode.PAGE);
       eventBus.dispatch("scrollmodechanged", { source: this, mode });
@@ -864,10 +857,10 @@ class PDFViewer {
       },
       () => {
         /* Prevent "Uncaught (in promise)"-messages in the console. */
-      }
+      },
     );
 
-    const onBeforeDraw = evt => {
+    const onBeforeDraw = (evt) => {
       const pageView = this._pages[evt.pageNumber - 1];
       if (!pageView) {
         return;
@@ -878,7 +871,7 @@ class PDFViewer {
     };
     eventBus._on("pagerender", onBeforeDraw, { signal });
 
-    const onAfterDraw = evt => {
+    const onAfterDraw = (evt) => {
       if (evt.cssTransform || evt.isDetailView) {
         return;
       }
@@ -928,7 +921,7 @@ class PDFViewer {
               this.#enableNewAltTextWhenAddingImage,
               this.#mlManager,
               this.#editorUndoBar,
-              this.#supportsPinchToZoom
+              this.#supportsPinchToZoom,
             );
             eventBus.dispatch("annotationeditoruimanager", {
               source: this,
@@ -967,8 +960,8 @@ class PDFViewer {
               "CanvasText",
               "Canvas",
               "HighlightText",
-              "Highlight"
-            )
+              "Highlight",
+            ),
           );
           viewer.style.setProperty(
             "--hcm-highlight-selected-filter",
@@ -977,8 +970,8 @@ class PDFViewer {
               "CanvasText",
               "Canvas",
               "HighlightText",
-              "ButtonText"
-            )
+              "ButtonText",
+            ),
           );
         }
 
@@ -1031,7 +1024,7 @@ class PDFViewer {
             document.addEventListener(
               "copy",
               this.#copyCallback.bind(this, textLayerMode),
-              { signal }
+              { signal },
             );
           }
 
@@ -1061,7 +1054,7 @@ class PDFViewer {
           }
           for (let pageNum = 2; pageNum <= pagesCount; ++pageNum) {
             const promise = pdfDocument.getPage(pageNum).then(
-              pdfPage => {
+              (pdfPage) => {
                 const pageView = this._pages[pageNum - 1];
                 if (!pageView.pdfPage) {
                   pageView.setPdfPage(pdfPage);
@@ -1070,15 +1063,15 @@ class PDFViewer {
                   this._pagesCapability.resolve();
                 }
               },
-              reason => {
+              (reason) => {
                 console.error(
                   `Unable to get page ${pageNum} to initialize viewer`,
-                  reason
+                  reason,
                 );
                 if (--getPagesLeft === 0) {
                   this._pagesCapability.resolve();
                 }
-              }
+              },
             );
 
             if (pageNum % PagesCountLimit.PAUSE_EAGER_PAGE_INIT === 0) {
@@ -1102,7 +1095,7 @@ class PDFViewer {
           this.update();
         }
       })
-      .catch(reason => {
+      .catch((reason) => {
         console.error("Unable to initialize viewer", reason);
 
         this._pagesCapability.reject(reason);
@@ -1304,7 +1297,7 @@ class PDFViewer {
   #setScaleUpdatePages(
     newScale,
     newValue,
-    { noScroll = false, preset = false, drawingDelay = -1, origin = null }
+    { noScroll = false, preset = false, drawingDelay = -1, origin = null },
   ) {
     this._currentScaleValue = newValue.toString();
 
@@ -1321,7 +1314,7 @@ class PDFViewer {
 
     this.viewer.style.setProperty(
       "--scale-factor",
-      newScale * PixelsPerInch.PDF_TO_CSS_UNITS
+      newScale * PixelsPerInch.PDF_TO_CSS_UNITS,
     );
 
     const postponeDrawing = drawingDelay >= 0 && drawingDelay < 1000;
@@ -1518,7 +1511,7 @@ class PDFViewer {
       Number.isInteger(pageNumber) && this._pages[pageNumber - 1];
     if (!pageView) {
       console.error(
-        `scrollPageIntoView: "${pageNumber}" is not a valid pageNumber parameter.`
+        `scrollPageIntoView: "${pageNumber}" is not a valid pageNumber parameter.`,
       );
       return;
     }
@@ -1607,7 +1600,7 @@ class PDFViewer {
         break;
       default:
         console.error(
-          `scrollPageIntoView: "${destArray[1].name}" is not a valid destination type.`
+          `scrollPageIntoView: "${destArray[1].name}" is not a valid destination type.`,
         );
         return;
     }
@@ -1655,7 +1648,7 @@ class PDFViewer {
     const container = this.container;
     const topLeft = currentPageView.getPagePoint(
       container.scrollLeft - firstPage.x,
-      container.scrollTop - firstPage.y
+      container.scrollTop - firstPage.y,
     );
     const intLeft = Math.round(topLeft[0]);
     const intTop = Math.round(topLeft[1]);
@@ -1714,7 +1707,7 @@ class PDFViewer {
       }
     }
     this._setCurrentPageNumber(
-      stillFullyVisible ? currentId : visiblePages[0].id
+      stillFullyVisible ? currentId : visiblePages[0].id,
     );
 
     this._updateLocation(visible.first);
@@ -1869,14 +1862,14 @@ class PDFViewer {
       // Don't attempt to re-render it: this will be done once the user
       // stops scrolling.
       (this.#scrollTimeoutId !== null &&
-        visiblePages.views.some(page => page.detailView?.renderingCancelled));
+        visiblePages.views.some((page) => page.detailView?.renderingCancelled));
 
     const pageView = this.renderingQueue.getHighestPriority(
       visiblePages,
       this._pages,
       scrollAhead,
       preRenderExtra,
-      ignoreDetailViews
+      ignoreDetailViews,
     );
 
     if (pageView) {
@@ -1912,7 +1905,7 @@ class PDFViewer {
    */
   getPagesOverview() {
     let initialOrientation;
-    return this._pages.map(pageView => {
+    return this._pages.map((pageView) => {
       const viewport = pageView.pdfPage.getViewport({ scale: 1 });
       const orientation = isPortraitOrientation(viewport);
       if (initialOrientation === undefined) {
@@ -2023,7 +2016,7 @@ class PDFViewer {
 
     viewer.classList.toggle(
       "scrollHorizontal",
-      scrollMode === ScrollMode.HORIZONTAL
+      scrollMode === ScrollMode.HORIZONTAL,
     );
     viewer.classList.toggle("scrollWrapped", scrollMode === ScrollMode.WRAPPED);
 
@@ -2277,7 +2270,7 @@ class PDFViewer {
   updateScale({ drawingDelay, scaleFactor = null, steps = null, origin }) {
     if (steps === null && scaleFactor === null) {
       throw new Error(
-        "Invalid updateScale options: either `steps` or `scaleFactor` must be provided."
+        "Invalid updateScale options: either `steps` or `scaleFactor` must be provided.",
       );
     }
     if (!this.pdfDocument) {
@@ -2325,7 +2318,7 @@ class PDFViewer {
     for (const entry of entries) {
       if (entry.target === this.container) {
         this.#updateContainerHeightCss(
-          Math.floor(entry.borderBoxSize[0].blockSize)
+          Math.floor(entry.borderBoxSize[0].blockSize),
         );
         this.#containerTopLeft = null;
         break;
@@ -2412,7 +2405,7 @@ class PDFViewer {
       await this.#annotationEditorUIManager.updateMode(
         mode,
         editId,
-        isFromKeyboard
+        isFromKeyboard,
       );
       if (
         mode !== this.#annotationEditorMode ||
@@ -2458,11 +2451,11 @@ class PDFViewer {
             if (idsToRefresh.size === 0) {
               this.#switchAnnotationEditorModeTimeoutId = setTimeout(
                 updater,
-                0
+                0,
               );
             }
           },
-          { signal }
+          { signal },
         );
         return;
       }

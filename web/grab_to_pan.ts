@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2013 Rob Wu <rob@robwu.nl>
  * https://github.com/Rob--W/grab-to-pan.js
  *

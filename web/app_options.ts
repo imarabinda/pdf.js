@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2018 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { AnnotationEditorType, AnnotationMode, version } from "pdfjs-dist";
+import { LinkTarget } from "./pdf_link_service";
+import {
+  CursorTool,
+  ScrollMode,
+  SidebarView,
+  SpreadMode,
+  TextLayerMode,
+  ViewOnLoad,
+} from "./ui_utils";
 
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
   // eslint-disable-next-line no-var
@@ -123,17 +135,17 @@ const defaultOptions = {
   },
   supportsMouseWheelZoomCtrlKey: {
     /** @type {boolean} */
-    value: true,
+    value: false,
     kind: OptionKind.BROWSER,
   },
   supportsMouseWheelZoomMetaKey: {
     /** @type {boolean} */
-    value: true,
+    value: false,
     kind: OptionKind.BROWSER,
   },
   supportsPinchToZoom: {
     /** @type {boolean} */
-    value: true,
+    value: false,
     kind: OptionKind.BROWSER,
   },
   toolbarDensity: {
@@ -144,25 +156,22 @@ const defaultOptions = {
 
   altTextLearnMoreUrl: {
     /** @type {string} */
-    value:
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
-        ? "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/pdf-alt-text"
-        : "",
+    value: "",
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   annotationEditorMode: {
     /** @type {number} */
-    value: 0,
+    value: AnnotationEditorType.DISABLE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   annotationMode: {
     /** @type {number} */
-    value: 2,
+    value: AnnotationMode.DISABLE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   cursorToolOnLoad: {
     /** @type {number} */
-    value: 0,
+    value: CursorTool.SELECT,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   defaultZoomDelay: {
@@ -177,7 +186,7 @@ const defaultOptions = {
   },
   disableHistory: {
     /** @type {boolean} */
-    value: false,
+    value: true,
     kind: OptionKind.VIEWER,
   },
   disablePageLabels: {
@@ -258,7 +267,7 @@ const defaultOptions = {
   },
   externalLinkTarget: {
     /** @type {number} */
-    value: 0,
+    value: LinkTarget.NONE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   highlightEditorColors: {
@@ -278,10 +287,7 @@ const defaultOptions = {
   },
   imageResourcesPath: {
     /** @type {string} */
-    value:
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
-        ? "resource://pdf.js/web/images/"
-        : "./images/",
+    value: "./images/",
     kind: OptionKind.VIEWER,
   },
   maxCanvasPixels: {
@@ -311,32 +317,27 @@ const defaultOptions = {
   },
   sidebarViewOnLoad: {
     /** @type {number} */
-    value: -1,
+    value: SidebarView.NONE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   scrollModeOnLoad: {
     /** @type {number} */
-    value: -1,
+    value: ScrollMode.PAGE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   spreadModeOnLoad: {
     /** @type {number} */
-    value: -1,
+    value: SpreadMode.NONE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   textLayerMode: {
     /** @type {number} */
-    value: 1,
-    kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
-  },
-  viewerCssTheme: {
-    /** @type {number} */
-    value: typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME") ? 2 : 0,
+    value: TextLayerMode.DISABLE,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   viewOnLoad: {
     /** @type {boolean} */
-    value: 0,
+    value: ViewOnLoad.INITIAL,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
 
@@ -347,13 +348,7 @@ const defaultOptions = {
   },
   cMapUrl: {
     /** @type {string} */
-    value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../external/bcmaps/"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/web/cmaps/"
-          : "../web/cmaps/",
+    value: `https://unpkg.com/pdfjs-dist@${version}/cmaps/`,
     kind: OptionKind.API,
   },
   disableAutoFetch: {
@@ -378,7 +373,7 @@ const defaultOptions = {
   },
   docBaseUrl: {
     /** @type {string} */
-    value: typeof PDFJSDev === "undefined" ? document.URL.split("#", 1)[0] : "",
+    value: "",
     kind: OptionKind.API,
   },
   enableHWA: {
@@ -394,17 +389,6 @@ const defaultOptions = {
   fontExtraProperties: {
     /** @type {boolean} */
     value: false,
-    kind: OptionKind.API,
-  },
-  iccUrl: {
-    /** @type {string} */
-    value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../external/iccs/"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/web/iccs/"
-          : "../web/iccs/",
     kind: OptionKind.API,
   },
   isEvalSupported: {
@@ -424,13 +408,7 @@ const defaultOptions = {
   },
   standardFontDataUrl: {
     /** @type {string} */
-    value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../external/standard_fonts/"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/web/standard_fonts/"
-          : "../web/standard_fonts/",
+    value: `https://unpkg.com/pdfjs-dist@${version}/standard_fonts/`,
     kind: OptionKind.API,
   },
   useSystemFonts: {
@@ -454,10 +432,8 @@ const defaultOptions = {
   },
   wasmUrl: {
     /** @type {string} */
-    value:
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
-        ? "resource://pdf.js/web/wasm/"
-        : "../web/wasm/",
+
+    value: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/wasm/`,
     kind: OptionKind.API,
   },
 
@@ -468,39 +444,22 @@ const defaultOptions = {
   },
   workerSrc: {
     /** @type {string} */
-    value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../src/pdf.worker.js"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/build/pdf.worker.mjs"
-          : "../build/pdf.worker.mjs",
+    value: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`,
     kind: OptionKind.WORKER,
   },
 };
-if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("MOZCENTRAL")) {
-  defaultOptions.defaultUrl = {
-    /** @type {string} */
-    value:
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")
-        ? ""
-        : "compressed.tracemonkey-pldi-09.pdf",
-    kind: OptionKind.VIEWER,
-  };
-  defaultOptions.sandboxBundleSrc = {
-    /** @type {string} */
-    value:
-      typeof PDFJSDev === "undefined"
-        ? "../build/dev-sandbox/pdf.sandbox.mjs"
-        : "../build/pdf.sandbox.mjs",
-    kind: OptionKind.VIEWER,
-  };
-  defaultOptions.enableFakeMLManager = {
-    /** @type {boolean} */
-    value: true,
-    kind: OptionKind.VIEWER,
-  };
-}
+
+defaultOptions.sandboxBundleSrc = {
+  /** @type {string} */
+  value: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/pdf.sandbox.min.mjs`,
+  kind: OptionKind.VIEWER,
+};
+defaultOptions.enableFakeMLManager = {
+  /** @type {boolean} */
+  value: true,
+  kind: OptionKind.VIEWER,
+};
+
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
   defaultOptions.disablePreferences = {
     /** @type {boolean} */
@@ -529,12 +488,12 @@ if (typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING || LIB")) {
       }
       if (type !== undefined) {
         throw new Error(
-          `Cannot have \`type\`-field for "PREFERENCE" kind: ${name}`
+          `Cannot have \`type\`-field for "PREFERENCE" kind: ${name}`,
         );
       }
       if (typeof compatParams === "object" && compatParams.has(name)) {
         throw new Error(
-          `Should not have compatibility-value for "PREFERENCE" kind: ${name}`
+          `Should not have compatibility-value for "PREFERENCE" kind: ${name}`,
         );
       }
       // Only "simple" preference-values are allowed.
@@ -548,12 +507,12 @@ if (typeof PDFJSDev === "undefined" || PDFJSDev.test("TESTING || LIB")) {
     } else if (kind & OptionKind.BROWSER) {
       if (type !== undefined) {
         throw new Error(
-          `Cannot have \`type\`-field for "BROWSER" kind: ${name}`
+          `Cannot have \`type\`-field for "BROWSER" kind: ${name}`,
         );
       }
       if (typeof compatParams === "object" && compatParams.has(name)) {
         throw new Error(
-          `Should not have compatibility-value for "BROWSER" kind: ${name}`
+          `Should not have compatibility-value for "BROWSER" kind: ${name}`,
         );
       }
       if (value === undefined) {
@@ -590,7 +549,7 @@ class AppOptions {
         if (this._hasInvokedSet) {
           console.warn(
             "The Preferences may override manually set AppOptions; " +
-              'please use the "disablePreferences"-option to prevent that.'
+              'please use the "disablePreferences"-option to prevent that.',
           );
         }
         return false;

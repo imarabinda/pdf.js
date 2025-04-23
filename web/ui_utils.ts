@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,6 +76,11 @@ const CursorTool = {
   ZOOM: 2,
 };
 
+const ViewOnLoad = {
+  UNKNOWN: -1,
+  PREVIOUS: 0, // Default value.
+  INITIAL: 1,
+};
 // Used by `PDFViewerApplication`, and by the API unit-tests.
 const AutoPrintRegExp = /\bprint\s*\(/;
 
@@ -172,7 +178,7 @@ function watchScroll(viewAreaElement, callback, abortSignal = undefined) {
   abortSignal?.addEventListener(
     "abort",
     () => window.cancelAnimationFrame(rAF),
-    { once: true }
+    { once: true },
   );
   return state;
 }
@@ -201,7 +207,9 @@ function removeNullCharacters(str, replaceInvisible = false) {
     return str;
   }
   if (replaceInvisible) {
-    return str.replaceAll(InvisibleCharsRegExp, m => (m === "\x00" ? "" : " "));
+    return str.replaceAll(InvisibleCharsRegExp, (m) =>
+      m === "\x00" ? "" : " ",
+    );
   }
   return str.replaceAll("\x00", "");
 }
@@ -493,7 +501,7 @@ function getVisibleElements({
     views,
     horizontal
       ? isElementNextAfterViewHorizontally
-      : isElementBottomAfterViewTop
+      : isElementBottomAfterViewTop,
   );
 
   // Please note the return value of the `binarySearchFirstItem` function when
@@ -511,7 +519,7 @@ function getVisibleElements({
     firstVisibleElementInd = backtrackBeforeAllVisibleElements(
       firstVisibleElementInd,
       views,
-      top
+      top,
     );
   }
 
@@ -719,7 +727,7 @@ class ProgressBar {
     if (scrollbarWidth > 0) {
       this.#style.setProperty(
         "--progressBar-end-offset",
-        `${scrollbarWidth}px`
+        `${scrollbarWidth}px`,
       );
     }
   }
@@ -834,15 +842,15 @@ function apiPageModeToSidebarView(mode) {
 }
 
 function toggleCheckedBtn(button, toggle, view = null) {
-  button.classList.toggle("toggled", toggle);
-  button.setAttribute("aria-checked", toggle);
+  button?.classList.toggle("toggled", toggle);
+  button?.setAttribute("aria-checked", toggle);
 
   view?.classList.toggle("hidden", !toggle);
 }
 
 function toggleExpandedBtn(button, toggle, view = null) {
-  button.classList.toggle("toggled", toggle);
-  button.setAttribute("aria-expanded", toggle);
+  button?.classList.toggle("toggled", toggle);
+  button?.setAttribute("aria-expanded", toggle);
 
   view?.classList.toggle("hidden", !toggle);
 }
@@ -859,11 +867,11 @@ const calcRound =
           PDFJSDev.test("LIB") &&
           typeof document === "undefined"
         ) {
-          return x => x;
+          return (x) => x;
         }
         const e = document.createElement("div");
         e.style.width = "round(down, calc(1.6666666666666665 * 792px), 1px)";
-        return e.style.width === "calc(1320px)" ? Math.fround : x => x;
+        return e.style.width === "calc(1320px)" ? Math.fround : (x) => x;
       })();
 
 export {
@@ -908,5 +916,6 @@ export {
   toggleExpandedBtn,
   UNKNOWN_SCALE,
   VERTICAL_PADDING,
+  ViewOnLoad,
   watchScroll,
 };

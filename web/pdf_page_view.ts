@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +32,19 @@ import {
   setLayerDimensions,
   shadow,
 } from "pdfjs-lib";
+import { AnnotationEditorLayerBuilder } from "./annotation_editor_layer_builder";
+import { AnnotationLayerBuilder } from "./annotation_layer_builder";
+import { AppOptions } from "./app_options";
+import { Autolinker } from "./autolinker";
+import { BasePDFPageView } from "./base_pdf_page_view";
+import { DrawLayerBuilder } from "./draw_layer_builder";
+import { GenericL10n } from "./genericl10n";
+import { SimpleLinkService } from "./pdf_link_service";
+import { PDFPageDetailView } from "./pdf_page_detail_view";
+import { StructTreeLayerBuilder } from "./struct_tree_layer_builder";
+import { TextAccessibilityManager } from "./text_accessibility";
+import { TextHighlighter } from "./text_highlighter";
+import { TextLayerBuilder } from "./text_layer_builder";
 import {
   approximateFraction,
   calcRound,
@@ -38,21 +52,8 @@ import {
   floorToDivide,
   RenderingStates,
   TextLayerMode,
-} from "./ui_utils.js";
-import { AnnotationEditorLayerBuilder } from "./annotation_editor_layer_builder.js";
-import { AnnotationLayerBuilder } from "./annotation_layer_builder.js";
-import { AppOptions } from "./app_options.js";
-import { Autolinker } from "./autolinker.js";
-import { BasePDFPageView } from "./base_pdf_page_view.js";
-import { DrawLayerBuilder } from "./draw_layer_builder.js";
-import { GenericL10n } from "web-null_l10n";
-import { PDFPageDetailView } from "./pdf_page_detail_view.js";
-import { SimpleLinkService } from "./pdf_link_service.js";
-import { StructTreeLayerBuilder } from "./struct_tree_layer_builder.js";
-import { TextAccessibilityManager } from "./text_accessibility.js";
-import { TextHighlighter } from "./text_highlighter.js";
-import { TextLayerBuilder } from "./text_layer_builder.js";
-import { XfaLayerBuilder } from "./xfa_layer_builder.js";
+} from "./ui_utils";
+import { XfaLayerBuilder } from "./xfa_layer_builder";
 
 /**
  * @typedef {Object} PDFPageViewOptions
@@ -230,13 +231,13 @@ class PDFPageView extends BasePDFPageView {
       // see issue 15795.
       container?.style.setProperty(
         "--scale-factor",
-        this.scale * PixelsPerInch.PDF_TO_CSS_UNITS
+        this.scale * PixelsPerInch.PDF_TO_CSS_UNITS,
       );
 
       if (this.pageColors?.background) {
         container?.style.setProperty(
           "--page-bg-color",
-          this.pageColors.background
+          this.pageColors.background,
         );
       }
 
@@ -244,7 +245,7 @@ class PDFPageView extends BasePDFPageView {
       if (optionalContentConfigPromise) {
         // Ensure that the thumbnails always display the *initial* document
         // state, for documents with optional content.
-        optionalContentConfigPromise.then(optionalContentConfig => {
+        optionalContentConfigPromise.then((optionalContentConfig) => {
           if (
             optionalContentConfigPromise !== this._optionalContentConfigPromise
           ) {
@@ -302,7 +303,7 @@ class PDFPageView extends BasePDFPageView {
       div,
       viewport,
       /* mustFlip = */ true,
-      /* mustRotate = */ false
+      /* mustRotate = */ false,
     );
   }
 
@@ -320,8 +321,8 @@ class PDFPageView extends BasePDFPageView {
           "CanvasText",
           "Canvas",
           "HighlightText",
-          "Highlight"
-        )
+          "Highlight",
+        ),
       );
       this._container?.style.setProperty(
         "--hcm-highlight-selected-filter",
@@ -330,8 +331,8 @@ class PDFPageView extends BasePDFPageView {
           "CanvasText",
           "Canvas",
           "HighlightText",
-          "Highlight"
-        )
+          "Highlight",
+        ),
       );
     }
     this.pdfPage = pdfPage;
@@ -363,7 +364,7 @@ class PDFPageView extends BasePDFPageView {
         pageIndex: this.id - 1,
         eventBus: this.eventBus,
         findController: this.#layerProperties.findController,
-      })
+      }),
     );
   }
 
@@ -670,7 +671,7 @@ class PDFPageView extends BasePDFPageView {
 
       // Ensure that the thumbnails always display the *initial* document state,
       // for documents with optional content.
-      optionalContentConfigPromise.then(optionalContentConfig => {
+      optionalContentConfigPromise.then((optionalContentConfig) => {
         if (
           optionalContentConfigPromise !== this._optionalContentConfigPromise
         ) {
@@ -741,7 +742,7 @@ class PDFPageView extends BasePDFPageView {
 
           this.dispatchPageRendered(
             /* cssTransform */ true,
-            /* isDetailView */ false
+            /* isDetailView */ false,
           );
         }
         return;
@@ -780,7 +781,7 @@ class PDFPageView extends BasePDFPageView {
         width,
         height,
         this.maxCanvasPixels,
-        this.maxCanvasDim
+        this.maxCanvasDim,
       );
     }
   }
@@ -949,7 +950,7 @@ class PDFPageView extends BasePDFPageView {
         accessibilityManager: this._accessibilityManager,
         enablePermissions:
           this.#textLayerMode === TextLayerMode.ENABLE_PERMISSIONS,
-        onAppend: textLayerDiv => {
+        onAppend: (textLayerDiv) => {
           // Pause translation when inserting the textLayer in the DOM.
           this.l10n.pause();
           this.#addLayer(textLayerDiv, "textLayer");
@@ -986,7 +987,7 @@ class PDFPageView extends BasePDFPageView {
         annotationCanvasMap: this._annotationCanvasMap,
         accessibilityManager: this._accessibilityManager,
         annotationEditorUIManager,
-        onAppend: annotationLayerDiv => {
+        onAppend: (annotationLayerDiv) => {
           this.#addLayer(annotationLayerDiv, "annotationLayer");
         },
       });
@@ -995,7 +996,7 @@ class PDFPageView extends BasePDFPageView {
     const { width, height } = viewport;
     this.#originalViewport = viewport;
 
-    const { canvas, prevCanvas, ctx } = this._createCanvas(newCanvas => {
+    const { canvas, prevCanvas, ctx } = this._createCanvas((newCanvas) => {
       // Always inject the canvas as the first element in the wrapper.
       canvasWrapper.prepend(newCanvas);
     });
@@ -1012,11 +1013,11 @@ class PDFPageView extends BasePDFPageView {
 
     const canvasWidth = (canvas.width = floorToDivide(
       calcRound(width * outputScale.sx),
-      sfx[0]
+      sfx[0],
     ));
     const canvasHeight = (canvas.height = floorToDivide(
       calcRound(height * outputScale.sy),
-      sfy[0]
+      sfy[0],
     ));
     const pageWidth = floorToDivide(calcRound(width), sfx[1]);
     const pageHeight = floorToDivide(calcRound(height), sfy[1]);
@@ -1042,7 +1043,7 @@ class PDFPageView extends BasePDFPageView {
         prevCanvas?.remove();
         this._resetCanvas();
       },
-      renderTask => {
+      (renderTask) => {
         // Ensure that the thumbnails won't become partially (or fully) blank,
         // for documents that contain interactive form elements.
         this.#useThumbnailCanvas.regularAnnotations =
@@ -1050,13 +1051,13 @@ class PDFPageView extends BasePDFPageView {
 
         this.dispatchPageRendered(
           /* cssTransform */ false,
-          /* isDetailView */ false
+          /* isDetailView */ false,
         );
-      }
+      },
     ).then(async () => {
       this.structTreeLayer ||= new StructTreeLayerBuilder(
         pdfPage,
-        viewport.rawDims
+        viewport.rawDims,
       );
 
       const textLayerPromise = this.#renderTextLayer();
@@ -1089,7 +1090,7 @@ class PDFPageView extends BasePDFPageView {
         annotationLayer: this.annotationLayer?.annotationLayer,
         textLayer: this.textLayer,
         drawLayer: this.drawLayer.getDrawLayer(),
-        onAppend: annotationEditorLayerDiv => {
+        onAppend: (annotationEditorLayerDiv) => {
           this.#addLayer(annotationEditorLayerDiv, "annotationEditorLayer");
         },
       });
@@ -1124,7 +1125,7 @@ class PDFPageView extends BasePDFPageView {
 
     this.div.setAttribute(
       "data-l10n-args",
-      JSON.stringify({ page: this.pageLabel ?? this.id })
+      JSON.stringify({ page: this.pageLabel ?? this.id }),
     );
 
     if (this.pageLabel !== null) {

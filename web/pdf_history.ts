@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2017 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +17,8 @@
 /** @typedef {import("./event_utils").EventBus} EventBus */
 /** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
 
-import { isValidRotation, parseQueryString } from "./ui_utils.js";
-import { waitOnEventOrTimeout } from "./event_utils.js";
+import { waitOnEventOrTimeout } from "./event_utils";
+import { isValidRotation, parseQueryString } from "./ui_utils";
 
 // Heuristic value used when force-resetting `this._blockHashChange`.
 const HASH_CHANGE_TIMEOUT = 1000; // milliseconds
@@ -73,10 +74,10 @@ class PDFHistory {
 
       this.eventBus._on(
         "pagesloaded",
-        evt => {
+        (evt) => {
           this._isPagesLoaded = !!evt.pagesCount;
         },
-        { once: true }
+        { once: true },
       );
     });
   }
@@ -89,7 +90,7 @@ class PDFHistory {
   initialize({ fingerprint, resetHistory = false, updateUrl = false }) {
     if (!fingerprint || typeof fingerprint !== "string") {
       console.error(
-        'PDFHistory.initialize: The "fingerprint" must be a non-empty string.'
+        'PDFHistory.initialize: The "fingerprint" must be a non-empty string.',
       );
       return;
     }
@@ -117,7 +118,7 @@ class PDFHistory {
 
     if (!this.#isValidState(state, /* checkReload = */ true) || resetHistory) {
       const { hash, page, rotation } = this.#parseCurrentHash(
-        /* checkNameddest = */ true
+        /* checkNameddest = */ true,
       );
 
       if (!hash || reInitialized || resetHistory) {
@@ -129,7 +130,7 @@ class PDFHistory {
       // the document hash is present on PDF document load.
       this.#pushOrReplaceState(
         { hash, page, rotation },
-        /* forceReplace = */ true
+        /* forceReplace = */ true,
       );
       return;
     }
@@ -140,7 +141,7 @@ class PDFHistory {
     this.#updateInternalState(
       destination,
       state.uid,
-      /* removeTemporary = */ true
+      /* removeTemporary = */ true,
     );
 
     if (destination.rotation !== undefined) {
@@ -191,13 +192,13 @@ class PDFHistory {
     if (namedDest && typeof namedDest !== "string") {
       console.error(
         "PDFHistory.push: " +
-          `"${namedDest}" is not a valid namedDest parameter.`
+          `"${namedDest}" is not a valid namedDest parameter.`,
       );
       return;
     } else if (!Array.isArray(explicitDest)) {
       console.error(
         "PDFHistory.push: " +
-          `"${explicitDest}" is not a valid explicitDest parameter.`
+          `"${explicitDest}" is not a valid explicitDest parameter.`,
       );
       return;
     } else if (!this.#isValidPage(pageNumber)) {
@@ -206,7 +207,7 @@ class PDFHistory {
       if (pageNumber !== null || this._destination) {
         console.error(
           "PDFHistory.push: " +
-            `"${pageNumber}" is not a valid pageNumber parameter.`
+            `"${pageNumber}" is not a valid pageNumber parameter.`,
         );
         return;
       }
@@ -246,7 +247,7 @@ class PDFHistory {
         page: pageNumber,
         rotation: this.linkService.rotation,
       },
-      forceReplace
+      forceReplace,
     );
 
     if (!this._popStateInProgress) {
@@ -272,7 +273,7 @@ class PDFHistory {
     }
     if (!this.#isValidPage(pageNumber)) {
       console.error(
-        `PDFHistory.pushPage: "${pageNumber}" is not a valid page number.`
+        `PDFHistory.pushPage: "${pageNumber}" is not a valid page number.`,
       );
       return;
     }
@@ -598,7 +599,7 @@ class PDFHistory {
       const { hash, page, rotation } = this.#parseCurrentHash();
       this.#pushOrReplaceState(
         { hash, page, rotation },
-        /* forceReplace = */ true
+        /* forceReplace = */ true,
       );
       return;
     }
@@ -637,7 +638,7 @@ class PDFHistory {
     this.#updateInternalState(
       destination,
       state.uid,
-      /* removeTemporary = */ true
+      /* removeTemporary = */ true,
     );
 
     if (isValidRotation(destination.rotation)) {

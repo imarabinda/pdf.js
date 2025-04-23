@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +14,14 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
-/** @typedef {import("./interfaces.js").IL10n} IL10n */
-/** @typedef {import("./overlay_manager.js").OverlayManager} OverlayManager */
+/** @typedef {import("./event_utils").EventBus} EventBus */
+/** @typedef {import("./interfaces").IL10n} IL10n */
+/** @typedef {import("./overlay_manager").OverlayManager} OverlayManager */
 // eslint-disable-next-line max-len
-/** @typedef {import("../src/display/api.js").PDFDocumentProxy} PDFDocumentProxy */
+/** @typedef {import("../src/display/api").PDFDocumentProxy} PDFDocumentProxy */
 
-import { getPageSizeInches, isPortraitOrientation } from "./ui_utils.js";
 import { PDFDateString } from "pdfjs-lib";
+import { getPageSizeInches, isPortraitOrientation } from "./ui_utils";
 
 // See https://en.wikibooks.org/wiki/Lentis/Conversion_to_the_Metric_Standard_in_the_United_States
 const NON_METRIC_LOCALES = ["en-us", "en-lr", "my"];
@@ -67,7 +68,7 @@ class PDFDocumentProperties {
     overlayManager,
     eventBus,
     l10n,
-    fileNameLookup
+    fileNameLookup,
   ) {
     this.dialog = dialog;
     this.fields = fields;
@@ -81,10 +82,10 @@ class PDFDocumentProperties {
 
     this.overlayManager.register(this.dialog);
 
-    eventBus._on("pagechanging", evt => {
+    eventBus._on("pagechanging", (evt) => {
       this._currentPageNumber = evt.pageNumber;
     });
-    eventBus._on("rotationchanging", evt => {
+    eventBus._on("rotationchanging", (evt) => {
       this._pagesRotation = evt.pagesRotation;
     });
   }
@@ -231,7 +232,7 @@ class PDFDocumentProperties {
           mb >= 1
             ? "pdfjs-document-properties-size-mb"
             : "pdfjs-document-properties-size-kb",
-          { mb, kb, b }
+          { mb, kb, b },
         )
       : undefined;
   }
@@ -306,13 +307,13 @@ class PDFDocumentProperties {
       this.l10n.get(
         nonMetric
           ? "pdfjs-document-properties-page-size-unit-inches"
-          : "pdfjs-document-properties-page-size-unit-millimeters"
+          : "pdfjs-document-properties-page-size-unit-millimeters",
       ),
       nameId && this.l10n.get(nameId),
       this.l10n.get(
         isPortrait
           ? "pdfjs-document-properties-page-size-orientation-portrait"
-          : "pdfjs-document-properties-page-size-orientation-landscape"
+          : "pdfjs-document-properties-page-size-orientation-landscape",
       ),
     ]);
 
@@ -320,7 +321,7 @@ class PDFDocumentProperties {
       name
         ? "pdfjs-document-properties-page-size-dimension-name-string"
         : "pdfjs-document-properties-page-size-dimension-string",
-      { width, height, unit, name, orientation }
+      { width, height, unit, name, orientation },
     );
   }
 
@@ -337,7 +338,7 @@ class PDFDocumentProperties {
     return this.l10n.get(
       isLinearized
         ? "pdfjs-document-properties-linearized-yes"
-        : "pdfjs-document-properties-linearized-no"
+        : "pdfjs-document-properties-linearized-no",
     );
   }
 }

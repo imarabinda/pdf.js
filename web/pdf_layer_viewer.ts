@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2020 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +14,13 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 // eslint-disable-next-line max-len
-/** @typedef {import("../src/optional_content_config.js").OptionalContentConfig} OptionalContentConfig */
+/** @typedef {import("../src/optional_content_config").OptionalContentConfig} OptionalContentConfig */
 // eslint-disable-next-line max-len
-/** @typedef {import("../src/display/api.js").PDFDocumentProxy} PDFDocumentProxy */
+/** @typedef {import("../src/display/api").PDFDocumentProxy} PDFDocumentProxy */
 
-import { BaseTreeViewer } from "./base_tree_viewer.js";
+import { BaseTreeViewer } from "./base_tree_viewer";
 
 /**
  * @typedef {Object} PDFLayerViewerOptions
@@ -38,7 +39,7 @@ class PDFLayerViewer extends BaseTreeViewer {
   constructor(options) {
     super(options);
 
-    this.eventBus._on("optionalcontentconfigchanged", evt => {
+    this.eventBus._on("optionalcontentconfigchanged", (evt) => {
       this.#updateLayers(evt.promise);
     });
     this.eventBus._on("resetlayers", () => {
@@ -84,7 +85,7 @@ class PDFLayerViewer extends BaseTreeViewer {
       });
     };
 
-    element.onclick = evt => {
+    element.onclick = (evt) => {
       if (evt.target === input) {
         setVisibility();
         return true;

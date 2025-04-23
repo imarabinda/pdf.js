@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2013 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AppOptions, OptionKind } from "./app_options.js";
+import { AppOptions, OptionKind } from "./app_options";
 
 /**
  * BasePreferences - Abstract base class for storing persistent settings.
@@ -24,7 +25,7 @@ class BasePreferences {
   #defaults = Object.freeze(
     typeof PDFJSDev === "undefined"
       ? AppOptions.getAll(OptionKind.PREFERENCE, /* defaultOnly = */ true)
-      : PDFJSDev.eval("DEFAULT_PREFERENCES")
+      : PDFJSDev.eval("DEFAULT_PREFERENCES"),
   );
 
   #initializedPromise = null;
@@ -54,7 +55,7 @@ class BasePreferences {
           return;
         }
         AppOptions.setAll({ ...browserPrefs, ...prefs }, /* prefs = */ true);
-      }
+      },
     );
 
     if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
@@ -63,7 +64,7 @@ class BasePreferences {
         async ({ detail: { name, value } }) => {
           await this.#initializedPromise;
           AppOptions.setAll({ [name]: value }, /* prefs = */ true);
-        }
+        },
       );
     }
   }
@@ -117,7 +118,7 @@ class BasePreferences {
     await this._writeToStorage(
       typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
         ? { [name]: AppOptions.get(name) }
-        : AppOptions.getAll(OptionKind.PREFERENCE)
+        : AppOptions.getAll(OptionKind.PREFERENCE),
     );
   }
 

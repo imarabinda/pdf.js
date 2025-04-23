@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +14,9 @@
  * limitations under the License.
  */
 
-import { BasePDFPageView } from "./base_pdf_page_view.js";
 import { OutputScale } from "pdfjs-lib";
-import { RenderingStates } from "./ui_utils.js";
+import { BasePDFPageView } from "./base_pdf_page_view";
+import { RenderingStates } from "./ui_utils";
 
 /** @typedef {import("./interfaces").IRenderableView} IRenderableView */
 
@@ -156,7 +157,7 @@ class PDFPageDetailView extends BasePDFPageView {
     const visiblePixels =
       visibleWidth * visibleHeight * OutputScale.pixelRatio ** 2;
     const maxDetailToVisibleLinearRatio = Math.sqrt(
-      maxCanvasPixels / visiblePixels
+      maxCanvasPixels / visiblePixels,
     );
     const maxOverflowScale = (maxDetailToVisibleLinearRatio - 1) / 2;
     let overflowScale = Math.min(1, maxOverflowScale);
@@ -213,7 +214,7 @@ class PDFPageDetailView extends BasePDFPageView {
 
     const canvasWrapper = this.pageView._ensureCanvasWrapper();
 
-    const { canvas, prevCanvas, ctx } = this._createCanvas(newCanvas => {
+    const { canvas, prevCanvas, ctx } = this._createCanvas((newCanvas) => {
       // If there is already the background canvas, inject this new canvas
       // after it. We cannot simply use .append because all canvases must
       // be before the SVG elements used for drawings.
@@ -257,9 +258,9 @@ class PDFPageDetailView extends BasePDFPageView {
       () => {
         this.dispatchPageRendered(
           /* cssTransform */ false,
-          /* isDetailView */ true
+          /* isDetailView */ true,
         );
-      }
+      },
     );
 
     div.setAttribute("data-loaded", true);

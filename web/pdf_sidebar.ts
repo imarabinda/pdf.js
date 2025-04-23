@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2016 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
-/** @typedef {import("./interfaces.js").IL10n} IL10n */
+/** @typedef {import("./event_utils").EventBus} EventBus */
+/** @typedef {import("./interfaces").IL10n} IL10n */
 
 import {
   docStyle,
@@ -22,7 +23,7 @@ import {
   SidebarView,
   toggleCheckedBtn,
   toggleExpandedBtn,
-} from "./ui_utils.js";
+} from "./ui_utils";
 
 const SIDEBAR_WIDTH_VAR = "--sidebar-width";
 const SIDEBAR_MIN_WIDTH = 200; // pixels
@@ -120,11 +121,18 @@ class PDFSidebar {
 
     this.#hideUINotification(/* reset = */ true);
     this.switchView(SidebarView.THUMBS);
-
-    this.outlineButton.disabled = false;
-    this.attachmentsButton.disabled = false;
-    this.layersButton.disabled = false;
-    this._currentOutlineItemButton.disabled = true;
+    if (this.outlineButton) {
+      this.outlineButton.disabled = false;
+    }
+    if (this.attachmentsButton) {
+      this.attachmentsButton.disabled = false;
+    }
+    if (this.layersButton) {
+      this.layersButton.disabled = false;
+    }
+    if (this._currentOutlineItemButton) {
+      this._currentOutlineItemButton.disabled = true;
+    }
   }
 
   /**
@@ -181,7 +189,7 @@ class PDFSidebar {
         }
         break;
       case SidebarView.OUTLINE:
-        if (this.outlineButton.disabled) {
+        if (this.outlineButton?.disabled) {
           return;
         }
         break;
@@ -207,22 +215,22 @@ class PDFSidebar {
     toggleCheckedBtn(
       this.thumbnailButton,
       view === SidebarView.THUMBS,
-      this.thumbnailView
+      this.thumbnailView,
     );
     toggleCheckedBtn(
       this.outlineButton,
       view === SidebarView.OUTLINE,
-      this.outlineView
+      this.outlineView,
     );
     toggleCheckedBtn(
       this.attachmentsButton,
       view === SidebarView.ATTACHMENTS,
-      this.attachmentsView
+      this.attachmentsView,
     );
     toggleCheckedBtn(
       this.layersButton,
       view === SidebarView.LAYERS,
-      this.layersView
+      this.layersView,
     );
 
     if (forceOpen && !this.isOpen) {
@@ -271,7 +279,7 @@ class PDFSidebar {
 
     if (evt?.detail > 0) {
       // Remove focus from the toggleButton if it's clicked (see issue 17361).
-      this.toggleButton.blur();
+      this.toggleButton?.blur();
     }
   }
 
@@ -295,15 +303,15 @@ class PDFSidebar {
   }
 
   #showUINotification() {
-    this.toggleButton.setAttribute(
+    this.toggleButton?.setAttribute(
       "data-l10n-id",
-      "pdfjs-toggle-sidebar-notification-button"
+      "pdfjs-toggle-sidebar-notification-button",
     );
 
     if (!this.isOpen) {
       // Only show the notification on the `toggleButton` if the sidebar is
       // currently closed, to avoid unnecessarily bothering the user.
-      this.toggleButton.classList.add(UI_NOTIFICATION_CLASS);
+      this.toggleButton?.classList.add(UI_NOTIFICATION_CLASS);
     }
   }
 
@@ -311,13 +319,13 @@ class PDFSidebar {
     if (this.isOpen || reset) {
       // Only hide the notification on the `toggleButton` if the sidebar is
       // currently open, or when the current PDF document is being closed.
-      this.toggleButton.classList.remove(UI_NOTIFICATION_CLASS);
+      this.toggleButton?.classList.remove(UI_NOTIFICATION_CLASS);
     }
 
     if (reset) {
-      this.toggleButton.setAttribute(
+      this.toggleButton?.setAttribute(
         "data-l10n-id",
-        "pdfjs-toggle-sidebar-button"
+        "pdfjs-toggle-sidebar-button",
       );
     }
   }
@@ -325,7 +333,7 @@ class PDFSidebar {
   #addEventListeners() {
     const { eventBus, outerContainer } = this;
 
-    this.sidebarContainer.addEventListener("transitionend", evt => {
+    this.sidebarContainer.addEventListener("transitionend", (evt) => {
       if (evt.target === this.sidebarContainer) {
         outerContainer.classList.remove("sidebarMoving");
         // Ensure that rendering is triggered after opening/closing the sidebar.
@@ -333,41 +341,43 @@ class PDFSidebar {
       }
     });
 
-    this.toggleButton.addEventListener("click", evt => {
+    this.toggleButton?.addEventListener("click", (evt) => {
       this.toggle(evt);
     });
 
     // Buttons for switching views.
-    this.thumbnailButton.addEventListener("click", () => {
+    this.thumbnailButton?.addEventListener("click", () => {
       this.switchView(SidebarView.THUMBS);
     });
 
-    this.outlineButton.addEventListener("click", () => {
+    this.outlineButton?.addEventListener("click", () => {
       this.switchView(SidebarView.OUTLINE);
     });
-    this.outlineButton.addEventListener("dblclick", () => {
+    this.outlineButton?.addEventListener("dblclick", () => {
       eventBus.dispatch("toggleoutlinetree", { source: this });
     });
 
-    this.attachmentsButton.addEventListener("click", () => {
+    this.attachmentsButton?.addEventListener("click", () => {
       this.switchView(SidebarView.ATTACHMENTS);
     });
 
-    this.layersButton.addEventListener("click", () => {
+    this.layersButton?.addEventListener("click", () => {
       this.switchView(SidebarView.LAYERS);
     });
-    this.layersButton.addEventListener("dblclick", () => {
+    this.layersButton?.addEventListener("dblclick", () => {
       eventBus.dispatch("resetlayers", { source: this });
     });
 
     // Buttons for view-specific options.
-    this._currentOutlineItemButton.addEventListener("click", () => {
+    this._currentOutlineItemButton?.addEventListener("click", () => {
       eventBus.dispatch("currentoutlineitem", { source: this });
     });
 
     // Disable/enable views.
     const onTreeLoaded = (count, button, view) => {
-      button.disabled = !count;
+      if (button) {
+        button.disabled = !count;
+      }
 
       if (count) {
         this.#showUINotification();
@@ -378,31 +388,33 @@ class PDFSidebar {
       }
     };
 
-    eventBus._on("outlineloaded", evt => {
+    eventBus._on("outlineloaded", (evt) => {
       onTreeLoaded(evt.outlineCount, this.outlineButton, SidebarView.OUTLINE);
 
-      evt.currentOutlineItemPromise.then(enabled => {
+      evt.currentOutlineItemPromise.then((enabled) => {
         if (!this.isInitialViewSet) {
           return;
         }
-        this._currentOutlineItemButton.disabled = !enabled;
+        if (this._currentOutlineItemButton) {
+          this._currentOutlineItemButton.disabled = !enabled;
+        }
       });
     });
 
-    eventBus._on("attachmentsloaded", evt => {
+    eventBus._on("attachmentsloaded", (evt) => {
       onTreeLoaded(
         evt.attachmentsCount,
         this.attachmentsButton,
-        SidebarView.ATTACHMENTS
+        SidebarView.ATTACHMENTS,
       );
     });
 
-    eventBus._on("layersloaded", evt => {
+    eventBus._on("layersloaded", (evt) => {
       onTreeLoaded(evt.layersCount, this.layersButton, SidebarView.LAYERS);
     });
 
     // Update the thumbnailViewer, if visible, when exiting presentation mode.
-    eventBus._on("presentationmodechanged", evt => {
+    eventBus._on("presentationmodechanged", (evt) => {
       if (
         evt.state === PresentationModeState.NORMAL &&
         this.visibleView === SidebarView.THUMBS
@@ -412,7 +424,7 @@ class PDFSidebar {
     });
 
     // Handle resizing of the sidebar.
-    this.resizer.addEventListener("mousedown", evt => {
+    this.resizer?.addEventListener("mousedown", (evt) => {
       if (evt.button !== 0) {
         return;
       }
@@ -428,7 +440,7 @@ class PDFSidebar {
       window.addEventListener("blur", this.#mouseUp.bind(this), opts);
     });
 
-    eventBus._on("resize", evt => {
+    eventBus._on("resize", (evt) => {
       // When the *entire* viewer is resized, such that it becomes narrower,
       // ensure that the sidebar doesn't end up being too wide.
       if (evt.source !== window) {

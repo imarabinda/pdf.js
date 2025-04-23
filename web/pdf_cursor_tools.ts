@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2017 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,11 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 
 import { AnnotationEditorType, shadow } from "pdfjs-lib";
-import { CursorTool, PresentationModeState } from "./ui_utils.js";
-import { GrabToPan } from "./grab_to_pan.js";
+import { GrabToPan } from "./grab_to_pan";
+import { CursorTool, PresentationModeState } from "./ui_utils";
 
 /**
  * @typedef {Object} PDFCursorToolsOptions
@@ -120,7 +121,7 @@ class PDFCursorTools {
   }
 
   #addEventListeners() {
-    this.eventBus._on("switchcursortool", evt => {
+    this.eventBus._on("switchcursortool", (evt) => {
       if (!evt.reset) {
         this.switchTool(evt.tool);
       } else if (this.#prevActive !== null) {
@@ -179,7 +180,7 @@ class PDFCursorTools {
       "_handTool",
       new GrabToPan({
         element: this.container,
-      })
+      }),
     );
   }
 }

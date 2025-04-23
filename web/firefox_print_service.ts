@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2016 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@ import {
   RenderingCancelledException,
   shadow,
 } from "pdfjs-lib";
-import { getXfaHtmlForPrinting } from "./print_utils.js";
+import { getXfaHtmlForPrinting } from "./print_utils";
 
 // Creates a placeholder with div and canvas with right size for the page.
 function composePage(
@@ -29,7 +30,7 @@ function composePage(
   printContainer,
   printResolution,
   optionalContentConfigPromise,
-  printAnnotationStoragePromise
+  printAnnotationStoragePromise,
 ) {
   const canvas = document.createElement("canvas");
 
@@ -108,7 +109,7 @@ function composePage(
           } else {
             obj.done();
           }
-        }
+        },
       );
   };
 }
@@ -147,11 +148,11 @@ class FirefoxPrintService {
 
     const { width, height } = this.pagesOverview[0];
     const hasEqualPageSizes = this.pagesOverview.every(
-      size => size.width === width && size.height === height
+      (size) => size.width === width && size.height === height,
     );
     if (!hasEqualPageSizes) {
       console.warn(
-        "Not all pages have the same size. The printed result may be incorrect!"
+        "Not all pages have the same size. The printed result may be incorrect!",
       );
     }
 
@@ -175,7 +176,7 @@ class FirefoxPrintService {
         printContainer,
         _printResolution,
         _optionalContentConfigPromise,
-        _printAnnotationStoragePromise
+        _printAnnotationStoragePromise,
       );
     }
   }

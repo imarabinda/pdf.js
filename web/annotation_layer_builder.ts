@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2014 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +22,11 @@
 /** @typedef {import("./interfaces").IDownloadManager} IDownloadManager */
 /** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
 // eslint-disable-next-line max-len
-/** @typedef {import("./struct_tree_layer_builder.js").StructTreeLayerBuilder} StructTreeLayerBuilder */
+/** @typedef {import("./struct_tree_layer_builder").StructTreeLayerBuilder} StructTreeLayerBuilder */
 // eslint-disable-next-line max-len
-/** @typedef {import("./text_accessibility.js").TextAccessibilityManager} TextAccessibilityManager */
+/** @typedef {import("./text_accessibility").TextAccessibilityManager} TextAccessibilityManager */
 // eslint-disable-next-line max-len
-/** @typedef {import("../src/display/editor/tools.js").AnnotationEditorUIManager} AnnotationEditorUIManager */
+/** @typedef {import("../src/display/editor/tools").AnnotationEditorUIManager} AnnotationEditorUIManager */
 
 import {
   AnnotationLayer,
@@ -33,7 +34,7 @@ import {
   setLayerDimensions,
   Util,
 } from "pdfjs-lib";
-import { PresentationModeState } from "./ui_utils.js";
+import { PresentationModeState } from "./ui_utils";
 
 /**
  * @typedef {Object} AnnotationLayerBuilderOptions
@@ -183,10 +184,10 @@ class AnnotationLayerBuilder {
 
       this._eventBus?._on(
         "presentationmodechanged",
-        evt => {
+        (evt) => {
           this.#updatePresentationModeState(evt.state);
         },
-        { signal: this.#eventAbortController.signal }
+        { signal: this.#eventAbortController.signal },
       );
     }
   }
@@ -234,7 +235,7 @@ class AnnotationLayerBuilder {
   }) {
     if (this.#annotations === null) {
       throw new Error(
-        "`render` method must be called before `injectLinkAnnotations`."
+        "`render` method must be called before `injectLinkAnnotations`.",
       );
     }
     if (this._cancelled || this.#linksInjected) {
@@ -324,7 +325,7 @@ class AnnotationLayerBuilder {
       return totalArea;
     }
 
-    return inferredLinks.filter(link => {
+    return inferredLinks.filter((link) => {
       let linkAreaRects;
 
       for (const annotation of this.#annotations) {

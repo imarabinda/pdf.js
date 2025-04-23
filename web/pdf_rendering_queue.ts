@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@
 /** @typedef {import("./pdf_thumbnail_viewer").PDFThumbnailViewer} PDFThumbnailViewer */
 
 import { RenderingCancelledException } from "pdfjs-lib";
-import { RenderingStates } from "./ui_utils.js";
+import { RenderingStates } from "./ui_utils";
 
 const CLEANUP_TIMEOUT = 30000;
 
@@ -109,7 +110,7 @@ class PDFRenderingQueue {
     views,
     scrolledDown,
     preRenderExtra = false,
-    ignoreDetailViews = false
+    ignoreDetailViews = false,
   ) {
     /**
      * The state has changed. Figure out which page has the highest priority to
@@ -215,7 +216,7 @@ class PDFRenderingQueue {
           .finally(() => {
             this.renderHighestPriority();
           })
-          .catch(reason => {
+          .catch((reason) => {
             if (reason instanceof RenderingCancelledException) {
               return;
             }

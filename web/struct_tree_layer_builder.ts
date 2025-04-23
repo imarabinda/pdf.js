@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2021 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,7 @@
 
 /** @typedef {import("../src/display/api").PDFPageProxy} PDFPageProxy */
 
-import { removeNullCharacters } from "./ui_utils.js";
+import { removeNullCharacters } from "./ui_utils";
 
 const PDF_ROLE_TO_HTML_ROLE = {
   // Document level structure types
@@ -176,7 +177,7 @@ class StructTreeLayerBuilder {
     if (lang !== undefined) {
       htmlElement.setAttribute(
         "lang",
-        removeNullCharacters(lang, /* replaceInvisible = */ true)
+        removeNullCharacters(lang, /* replaceInvisible = */ true),
       );
     }
   }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2021 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
  */
 
 import { getXfaPageViewport, PixelsPerInch } from "pdfjs-lib";
-import { SimpleLinkService } from "./pdf_link_service.js";
-import { XfaLayerBuilder } from "./xfa_layer_builder.js";
+import { SimpleLinkService } from "./pdf_link_service";
+import { XfaLayerBuilder } from "./xfa_layer_builder";
 
 function getXfaHtmlForPrinting(printContainer, pdfDocument) {
   const xfaHtml = pdfDocument.allXfaHtml;

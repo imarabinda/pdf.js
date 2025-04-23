@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +14,12 @@
  * limitations under the License.
  */
 
-/** @typedef {import("./event_utils.js").EventBus} EventBus */
+/** @typedef {import("./event_utils").EventBus} EventBus */
 // eslint-disable-next-line max-len
-/** @typedef {import("./download_manager.js").DownloadManager} DownloadManager */
+/** @typedef {import("./download_manager").DownloadManager} DownloadManager */
 
-import { BaseTreeViewer } from "./base_tree_viewer.js";
-import { waitOnEventOrTimeout } from "./event_utils.js";
+import { BaseTreeViewer } from "./base_tree_viewer";
+import { waitOnEventOrTimeout } from "./event_utils";
 
 /**
  * @typedef {Object} PDFAttachmentViewerOptions
@@ -43,7 +44,7 @@ class PDFAttachmentViewer extends BaseTreeViewer {
 
     this.eventBus._on(
       "fileattachmentannotation",
-      this.#appendAttachment.bind(this)
+      this.#appendAttachment.bind(this),
     );
   }
 

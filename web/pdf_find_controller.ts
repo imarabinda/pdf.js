@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +18,8 @@
 /** @typedef {import("./event_utils").EventBus} EventBus */
 /** @typedef {import("./interfaces").IPDFLinkService} IPDFLinkService */
 
-import { binarySearchFirstItem, scrollIntoView } from "./ui_utils.js";
-import { getCharacterType, getNormalizeWithNFKC } from "./pdf_find_utils.js";
+import { getCharacterType, getNormalizeWithNFKC } from "./pdf_find_utils";
+import { binarySearchFirstItem, scrollIntoView } from "./ui_utils";
 
 const FindState = {
   FOUND: 0,
@@ -152,8 +153,8 @@ function normalize(text) {
           "\\u0000",
     ];
     normalizationRegex = new RegExp(
-      regexps.map(r => `(${r})`).join("|"),
-      "gum"
+      regexps.map((r) => `(${r})`).join("|"),
+      "gum",
     );
 
     if (hasSyllables) {
@@ -351,7 +352,7 @@ function normalize(text) {
         shiftOrigin += newCharLen;
       }
       return p9;
-    }
+    },
   );
 
   positions.push(normalized.length, shift);
@@ -378,12 +379,12 @@ function getOriginalIndex(diffs, pos, len) {
   const start = pos;
   // Last char in the new string.
   const end = pos + len - 1;
-  let i = binarySearchFirstItem(starts, x => x >= start);
+  let i = binarySearchFirstItem(starts, (x) => x >= start);
   if (starts[i] > start) {
     --i;
   }
 
-  let j = binarySearchFirstItem(starts, x => x >= end, i);
+  let j = binarySearchFirstItem(starts, (x) => x >= end, i);
   if (starts[j] > end) {
     --j;
   }
@@ -622,7 +623,7 @@ class PDFFindController {
     }
     // We don't bother caching the normalized search query in the Array-case,
     // since this code-path is *essentially* unused in the default viewer.
-    return (query || []).filter(q => !!q).map(q => normalize(q)[0]);
+    return (query || []).filter((q) => !!q).map((q) => normalize(q)[0]);
   }
 
   #shouldDirtyMatch(state) {
@@ -711,7 +712,7 @@ class PDFFindController {
         p2 /* punctuation */,
         p3 /* whitespaces */,
         p4 /* diacritics */,
-        p5 /* letters */
+        p5 /* letters */,
       ) => {
         // We don't need to use a \s for whitespaces since all the different
         // kind of whitespaces are replaced by a single " ".
@@ -744,7 +745,7 @@ class PDFFindController {
           return `${p5}\\p{M}*`;
         }
         return p5;
-      }
+      },
     );
 
     const trailingSpaces = "[ ]*";
@@ -759,7 +760,7 @@ class PDFFindController {
       // aX must not match aXY.
       if (hasDiacritics) {
         DIACRITICS_EXCEPTION_STR ||= String.fromCharCode(
-          ...DIACRITICS_EXCEPTION
+          ...DIACRITICS_EXCEPTION,
         );
 
         isUnicode = true;
@@ -840,10 +841,10 @@ class PDFFindController {
       query = query
         .sort()
         .reverse()
-        .map(q => {
+        .map((q) => {
           const [isUnicodePart, queryPart] = this.#convertToRegExpString(
             q,
-            hasDiacritics
+            hasDiacritics,
           );
           isUnicode ||= isUnicodePart;
           return `(${queryPart})`;
@@ -889,9 +890,9 @@ class PDFFindController {
       deferred = deferred.then(() =>
         this._pdfDocument
           .getPage(i + 1)
-          .then(pdfPage => pdfPage.getTextContent(textOptions))
+          .then((pdfPage) => pdfPage.getTextContent(textOptions))
           .then(
-            textContent => {
+            (textContent) => {
               const strBuf = [];
 
               for (const textItem of textContent.items) {
@@ -909,18 +910,18 @@ class PDFFindController {
               ] = normalize(strBuf.join(""));
               resolve();
             },
-            reason => {
+            (reason) => {
               console.error(
                 `Unable to get text content for page ${i + 1}`,
-                reason
+                reason,
               );
               // Page error -- assuming no text content.
               this._pageContents[i] = "";
               this._pageDiffs[i] = null;
               this._hasDiacritics[i] = false;
               resolve();
-            }
-          )
+            },
+          ),
       );
     }
   }
